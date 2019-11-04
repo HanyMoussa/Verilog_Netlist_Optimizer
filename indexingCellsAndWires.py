@@ -25,23 +25,41 @@ for line in f:
             print("Instance name: ", instanceName)
         elif((count > 2) & (count <= len(data) - 2)): #ignore data[2] entry as it is an empty bracket
             if(x != data[len(data)-2]):
-                myCurrentInstance[x[1]] = x[3:len(x)-2]
-                print("the", x[1], "pin", x[3:len(x)-2])
+                if(x[1:4] == "CLK"):
+                    currentWire = x[5:len(x)-2]
+                    currentPin = x[1:4]
+                elif((x[1:3] == "YS") | (x[1:3] == "YC")):
+                    currentWire = x[4:len(x)-1]
+                    currentPin = x[1:3]
+                else:
+                    currentWire = x[3:len(x)-2]
+                    currentPin = x[1]
+                myCurrentInstance[currentPin] = currentWire
+                print("the", currentPin, "pin", currentWire)
                 
                 cell = library.get_group('cell', 'XOR2X1')
                 pin = cell.get_group('pin', 'Y')
                 PINDIRECTION = pin['direction']
                 
-                wires[x[3:len(x)-2]].append((instanceName, x[1], PINDIRECTION))
+                wires[currentWire].append((instanceName, currentPin, PINDIRECTION))
             else:
-                myCurrentInstance[x[1]] = x[3:len(x)-1]
-                print("the", x[1], "pin", x[3:len(x)-1])
+                if(x[1:4] == "CLK"):
+                    currentWire = x[5:len(x)-1]
+                    currentPin = x[1:4]
+                elif((x[1:3] == "YS") | (x[1:3] == "YC")):
+                    currentWire = x[4:len(x)-1]
+                    currentPin = x[1:3]
+                else:
+                    currentWire = x[3:len(x)-1]
+                    currentPin = x[1]
+                myCurrentInstance[currentPin] = currentWire
+                print("the", currentPin, "pin", currentWire)
                 
                 cell = library.get_group('cell', 'XOR2X1')
                 pin = cell.get_group('pin', 'Y')
                 PINDIRECTION = pin['direction']
                 
-                wires[x[3:len(x)-2]].append((instanceName, x[3:len(x)-1], PINDIRECTION))
+                wires[currentWire].append((instanceName, currentPin, PINDIRECTION))
         count += 1;
     instancesDict[instanceName] = myCurrentInstance
 
@@ -57,7 +75,8 @@ for instanceName in instancesDict.values():
 """
 
 for key,value in wires.items():
-    for wire in value:
-        print ("wire name:", key, "instance connected to:",  wire[0], "pin connected to =", wire[1], "direction:", wire[2])
+    if(len(value) == 1):
+        for wire in value:
+            print ("wire name:", key, "instance connected to:",  wire[0], "pin connected to =", wire[1], "direction:", wire[2])
 
 f.close()
