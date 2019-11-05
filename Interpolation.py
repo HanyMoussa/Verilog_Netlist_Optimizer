@@ -9,7 +9,7 @@ import scipy.interpolate
 capacitances = [20, 30, 40, 40]
 delays = [10, 20, 30, 35]
 
-targetCapacitance = 16
+targetCapacitance = 27
 
 interpolateDelay = scipy.interpolate.interp1d(capacitances, delays)
 print(interpolateDelay(targetCapacitance));
