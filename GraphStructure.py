@@ -10,11 +10,12 @@ graph = defaultdict(list);
 # the key is the source node
 # ('YS', u5, 'A', 2.64):
 #   We go from pin YS in u7 to pin A in u5 and the delay is 2.64
-graph['u7'].append(('YS', 'u5', 'A', 2.64))
-graph['u7'].append(('YC', 'u8', 'B', 2.5))
-graph['u5'].append(('Y', 'u8', 'C', 1))
 
+graph['u7'].append(['YS', 'u5', 'A', 2.64])
+graph['u7'].append(['YC', 'u8', 'B', 2.5])
+graph['u5'].append(['Y', 'u8', 'C', 1])
 
+print (graph)
 
 # Construct the Graph from the wires dictionary:    
 
