@@ -1,5 +1,6 @@
 from collections import defaultdict
 from liberty.parser import parse_liberty
+from liberty.types import select_timing_table
 
 library = parse_liberty(open("gscl45nm.lib").read())
 
@@ -85,12 +86,22 @@ def getPinCapacitance(instanceName, inPin, instancesDict):
     PINCAPACITANCE = pin['capacitance']
     return PINCAPACITANCE
 
-def getRowDelay(instanceName, outPin, instancesDict, delayRow, capacitanceRow):
+def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitanceColumn):
     cellType = instancesDict[instanceName]["cellType"]
     cell = library.get_group('cell', cellType)
     pin = cell.get_group('pin', outPin)
     
     if(cellType[0:3] == "DFF"): #for simplicity, assume input is D in any FF
+        
+        time_table_rise=select_timing_table(pin,"CLK","cell_rise").get_array("values")
+        time_table_fall=select_timing_table(pin,"CLK","cell_fall").get_array("values")
+        for i in range(6):
+            delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
+            
+        cellCapacitanceArray=select_timing_table(pin,"CLK","cell_fall").get_array("index_1")
+        for i in range(6):
+            capacitanceColumn.append(cellCapacitanceArray[0][i])
+        """
         timing = pin.get_groups('timing')
         timing_D = [g for g in timing if g['related_pin'] == 'CLK'][0]
         assert timing_D['related_pin'] == 'CLK'
@@ -105,7 +116,18 @@ def getRowDelay(instanceName, outPin, instancesDict, delayRow, capacitanceRow):
             
         for i in range(6):
             capacitanceRow.append(cellCapacitanceArray[0][i])
+        """
     else:
+        #for simplicity assume related pin is always A
+        time_table_rise=select_timing_table(pin,"A","cell_rise").get_array("values")
+        time_table_fall=select_timing_table(pin,"A","cell_fall").get_array("values")
+        for i in range(6):
+            delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
+            
+        cellCapacitanceArray=select_timing_table(pin,"A","cell_fall").get_array("index_1")
+        for i in range(6):
+            capacitanceColumn.append(cellCapacitanceArray[0][i])
+        """
         timing = pin.get_groups('timing')
         timing_A = [g for g in timing if g['related_pin'] == 'A'][0]
         assert timing_A['related_pin'] == 'A'
@@ -119,7 +141,7 @@ def getRowDelay(instanceName, outPin, instancesDict, delayRow, capacitanceRow):
             delayRow.append(max(cellFallArray[2][i],cellRiseArray[2][i]))
                 
         for i in range(6):
-            capacitanceRow.append(cellCapacitanceArray[0][i])
+            capacitanceRow.append(cellCapacitanceArray[0][i]) """
 """print(instancesDict["OAI21X1_10"])
 for key in instancesDict["OAI21X1_10"]:
     print(key, instancesDict["OAI21X1_10"][key])"""
@@ -139,11 +161,11 @@ for key,value in wires.items():
 
 displayAsAnInstantiation("NOR2X1_9", instancesDict)
 
-print (getPinCapacitance("NAND2X1_5", "A", instancesDict))
+print (getPinCapacitance("DFFPOSX1_1", "D", instancesDict))
 
-delayRow = []
-capacitanceRow = []
-getRowDelay("NOR2X1_9", 'Y', instancesDict, delayRow, capacitanceRow)
+delayColumn = []
+capacitanceColumn = []
+getColumnDelay("NOR2X1_9", 'Y', instancesDict, delayColumn, capacitanceColumn)
 
-print(delayRow)
-print(capacitanceRow)
+print(delayColumn)
+print(capacitanceColumn)
