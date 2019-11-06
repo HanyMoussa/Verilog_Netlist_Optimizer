@@ -24,7 +24,7 @@ def displayAsAnInstantiation(instanceName, instancesDict):
 def parseNetlist(fileName, wires, instancesDict):
     f = open(fileName, "r")
     for line in f:
-        print('\n')
+       # print('\n')
        # print(line)
         data = line.split()
         count = 0
@@ -33,10 +33,10 @@ def parseNetlist(fileName, wires, instancesDict):
             if(count == 0):
                 cellType = x;
                 myCurrentInstance["cellType"] = cellType
-                print("Cell type: ", cellType)
+               # print("Cell type: ", cellType)
             elif(count == 1):
                 instanceName = x;
-                print("Instance name: ", instanceName)
+              #  print("Instance name: ", instanceName)
             elif((count > 2) & (count <= len(data) - 2)): #ignore data[2] entry as it is an empty bracket
                 if(x != data[len(data)-2]):
                     if(x[1:4] == "CLK"):
@@ -49,10 +49,10 @@ def parseNetlist(fileName, wires, instancesDict):
                         currentWire = x[3:len(x)-2]
                         currentPin = x[1]
                     myCurrentInstance[currentPin] = currentWire
-                    print("the", currentPin, "pin", currentWire)
+                   # print("the", currentPin, "pin", currentWire)
                     
-                    cell = library.get_group('cell', 'XOR2X1')
-                    pin = cell.get_group('pin', 'Y')
+                    cell = library.get_group('cell', cellType)
+                    pin = cell.get_group('pin', currentPin)
                     PINDIRECTION = pin['direction']
                     
                     wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
@@ -67,16 +67,16 @@ def parseNetlist(fileName, wires, instancesDict):
                         currentWire = x[3:len(x)-1]
                         currentPin = x[1]
                     myCurrentInstance[currentPin] = currentWire
-                    print("the", currentPin, "pin", currentWire)
+                   # print("the", currentPin, "pin", currentWire)
                     
-                    cell = library.get_group('cell', 'XOR2X1')
-                    pin = cell.get_group('pin', 'Y')
+                    cell = library.get_group('cell', cellType)
+                    pin = cell.get_group('pin', currentPin)
                     PINDIRECTION = pin['direction']
                     
                     wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
             count += 1;
         instancesDict[instanceName] = myCurrentInstance
-        print(instancesDict[instanceName])
+        #print(instancesDict[instanceName])
         #instancesDict[instanceName]["Q"] = "TRY MODIFY DATA"
     f.close()
     
@@ -95,11 +95,11 @@ def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitance
         
         time_table_rise=select_timing_table(pin,"CLK","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"CLK","cell_fall").get_array("values")
-        for i in range(6):
+        for i in range(4):
             delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
             
         cellCapacitanceArray=select_timing_table(pin,"CLK","cell_fall").get_array("index_1")
-        for i in range(6):
+        for i in range(4):
             capacitanceColumn.append(cellCapacitanceArray[0][i])
         """
         timing = pin.get_groups('timing')
@@ -121,11 +121,11 @@ def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitance
         #for simplicity assume related pin is always A
         time_table_rise=select_timing_table(pin,"A","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"A","cell_fall").get_array("values")
-        for i in range(6):
+        for i in range(4):
             delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
             
         cellCapacitanceArray=select_timing_table(pin,"A","cell_fall").get_array("index_1")
-        for i in range(6):
+        for i in range(4):
             capacitanceColumn.append(cellCapacitanceArray[0][i])
         """
         timing = pin.get_groups('timing')
@@ -157,15 +157,16 @@ parseNetlist("netlist.v", wires, instancesDict)
 for key,value in wires.items():
     if(len(value) == 1):
         for wire in value:
-            print ("wire name:", key, "instance connected to:",  wire[0], "pin connected to =", wire[1], "direction:", wire[2])
+            pass
+     #       print ("wire name:", key, "instance connected to:",  wire[0], "pin connected to =", wire[1], "direction:", wire[2])
 
-displayAsAnInstantiation("NOR2X1_9", instancesDict)
+#displayAsAnInstantiation("NOR2X1_9", instancesDict)
 
-print (getPinCapacitance("DFFPOSX1_1", "D", instancesDict))
+#print (getPinCapacitance("DFFPOSX1_1", "D", instancesDict))
 
-delayColumn = []
-capacitanceColumn = []
-getColumnDelay("NOR2X1_9", 'Y', instancesDict, delayColumn, capacitanceColumn)
+#delayColumn = []
+#capacitanceColumn = []
+#getColumnDelay("NOR2X1_9", 'Y', instancesDict, delayColumn, capacitanceColumn)
 
-print(delayColumn)
-print(capacitanceColumn)
+#print(delayColumn)
+#print(capacitanceColumn)

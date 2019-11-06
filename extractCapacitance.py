@@ -4,7 +4,7 @@
 import scipy.interpolate
 from scipy.interpolate import UnivariateSpline
 
-def extractCapacitance(capacitances, delays, target):
+def getCapacitance(capacitances, delays, target):
     if((target > capacitances[-1]) | (target < capacitances[0])):
         extrapolator = UnivariateSpline(capacitances, delays)
         return max(extrapolator([target]), 0)
@@ -18,6 +18,6 @@ def main():
     delays = [10, 20, 30, 35, 50]
     targetCapacitance = 10
     
-    print(extractCapacitance(capacitances,delays, targetCapacitance))
+    #print(extractCapacitance(capacitances,delays, targetCapacitance))
     
 main()
