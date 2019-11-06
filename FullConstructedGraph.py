@@ -30,12 +30,13 @@ for key,value in wires.items():
             capacitance += getPinCapacitance(currentWire[0], currentWire[1], instancesDict)
     delayColumn = []
     capacitanceColumn = []
-    if(len(outputCell) > 1):
+    if(len(outputCell) > 0):
         getColumnDelay(outputCell[0], outputCell[1], instancesDict, delayColumn, capacitanceColumn)
         delay = getCapacitance(capacitanceColumn,delayColumn, capacitance)
         for currentWire in value:
-            if(currentWire != outputCell):
+            if((currentWire != outputCell) | (len(value) == 1)):
                 graph[outputCell[0]].append([key, outputCell[1], currentWire[0], currentWire[1], delay])
+            
             
             
             
