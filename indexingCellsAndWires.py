@@ -160,7 +160,7 @@ for key,value in wires.items():
             pass
      #       print ("wire name:", key, "instance connected to:",  wire[0], "pin connected to =", wire[1], "direction:", wire[2])
 
-#displayAsAnInstantiation("NOR2X1_9", instancesDict)
+#displayAsAnInstantiation("NOR2X1_1", instancesDict)
 
 #print (getPinCapacitance("DFFPOSX1_1", "D", instancesDict))
 
