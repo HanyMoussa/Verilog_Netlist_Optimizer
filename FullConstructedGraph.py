@@ -84,7 +84,7 @@ def constructGraph(wires,instancesDict, graph, library):
                 if(currentWire != outputCell):
                     graph[outputCell[0]].append([key, outputCell[1], currentWire[0], currentWire[1], delay])
                 elif ((currentWire == outputCell) & (len(value) == 1)):
-                    graph[outputCell[0]].append([key, outputCell[1], 'output cload', 'output cell', delay])
+                    graph[outputCell[0]].append([key, outputCell[1], 'output cload', 'output pin', delay])
             
 constructGraph(wires,instancesDict, graph, library)
 fixByBuffering('INVX8_1', 10, 3, 2, newWireCounter, newBufferCounter)   
