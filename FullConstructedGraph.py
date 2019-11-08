@@ -21,7 +21,11 @@ newWireCounter = 1
 newBufferCounter = 1
 parseNetlist("netlist.v", wires, instancesDict)
 
-def fixByBuffering(key, currentFanOut, nBuffers, size, newWireCounter, newBufferCounter):
+def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter):
+    if(currentFanOut%maxFanOut == 0):
+        nBuffers = (int(currentFanOut/maxFanOut))
+    else:
+        nBuffers = (int(currentFanOut/maxFanOut)) + 1
     newWires = []
     for currentWire in wires[graph[key][0][0]]:
         if(currentWire[2] == 'input'):
@@ -44,17 +48,20 @@ def fixByBuffering(key, currentFanOut, nBuffers, size, newWireCounter, newBuffer
         myCurrentInstance['A'] = graph[key][0][0]
         myCurrentWire = "new_wire_" + str(newWireCounter)
         myCurrentInstance['Y'] = myCurrentWire
-        
+       
         instancesDict[bufferInstanceName] = myCurrentInstance
         #displayAsAnInstantiation(bufferInstanceName, instancesDict)
         wires[myCurrentWire].append([bufferInstanceName, 'Y', 'output'])
-        for j in range(int(currentFanOut/nBuffers)):
+        for j in range(min(maxFanOut,currentFanOut-counter)):
             
             wires[myCurrentWire].append([newWires[counter][0], newWires[counter][1], 'input'])
             counter += 1
         newWireCounter += 1
         newBufferCounter += 1
     
+    #check if we need further buffering levels
+    if(nBuffers > maxFanOut):
+        fixByBuffering(key, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter)  
 
 
 
@@ -74,12 +81,13 @@ def constructGraph(wires,instancesDict, graph, library):
             getColumnDelay(outputCell[0], outputCell[1], instancesDict, delayColumn, capacitanceColumn)
             delay = getDelay(capacitanceColumn,delayColumn, capacitance)
             for currentWire in value:
-                if((currentWire != outputCell) | (len(value) == 1)):
+                if(currentWire != outputCell):
                     graph[outputCell[0]].append([key, outputCell[1], currentWire[0], currentWire[1], delay])
-            
+                elif ((currentWire == outputCell) & (len(value) == 1)):
+                    graph[outputCell[0]].append([key, outputCell[1], 'output cload', 'output cell', delay])
             
 constructGraph(wires,instancesDict, graph, library)
-fixByBuffering('BUFX4_1', 4,2,2, newWireCounter, newBufferCounter)   
+fixByBuffering('INVX8_1', 10, 3, 2, newWireCounter, newBufferCounter)   
 constructGraph(wires,instancesDict, graph, library)
 """
 for key,value in graph.items():
