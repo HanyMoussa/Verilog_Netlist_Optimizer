@@ -2,11 +2,6 @@ from collections import defaultdict
 from liberty.parser import parse_liberty
 from liberty.types import select_timing_table
 
-library = parse_liberty(open("gscl45nm.lib").read())
-
-wires = defaultdict(list);
-instancesDict = {}
-
 #display a cell as an instantiation
 def displayAsAnInstantiation(instanceName, instancesDict):
     myCounter = 0
@@ -21,7 +16,9 @@ def displayAsAnInstantiation(instanceName, instancesDict):
         myCounter += 1
     print (" );")
                 
-def parseNetlist(fileName, wires, instancesDict):
+def parseNetlist(fileName, wires, instancesDict, library):
+    wires.clear()
+    instancesDict.clear()
     f = open(fileName, "r")
     for line in f:
        # print('\n')
@@ -80,13 +77,13 @@ def parseNetlist(fileName, wires, instancesDict):
         #instancesDict[instanceName]["Q"] = "TRY MODIFY DATA"
     f.close()
     
-def getPinCapacitance(instanceName, inPin, instancesDict):
+def getPinCapacitance(instanceName, inPin, instancesDict, library):
     cell = library.get_group('cell', instancesDict[instanceName]["cellType"])
     pin = cell.get_group('pin', inPin)
     PINCAPACITANCE = pin['capacitance']
     return PINCAPACITANCE
 
-def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitanceColumn):
+def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitanceColumn, library):
     cellType = instancesDict[instanceName]["cellType"]
     cell = library.get_group('cell', cellType)
     pin = cell.get_group('pin', outPin)
@@ -153,12 +150,6 @@ for instanceName in instancesDict.values():
 """
 
 #parseNetlist("netlist.v", wires, instancesDict)
-
-for key,value in wires.items():
-    if(len(value) == 1):
-        for wire in value:
-            pass
-     #       print ("wire name:", key, "instance connected to:",  wire[0], "pin connected to =", wire[1], "direction:", wire[2])
 
 #displayAsAnInstantiation("NOR2X1_1", instancesDict)
 

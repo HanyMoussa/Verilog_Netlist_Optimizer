@@ -12,14 +12,6 @@ import scipy.interpolate
 from scipy.interpolate import UnivariateSpline
 from extractCapacitance import *
 
-library = parse_liberty(open("gscl45nm.lib").read())
-wires = defaultdict(list)
-instancesDict = {}
-graph = defaultdict(list)
-newWireCounter = [1]
-newBufferCounter = [1]
-parseNetlist("netlist.v", wires, instancesDict)
-
 
 def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireCounter, wires, graph):
     if(currentFanOut%maxFanOut == 0):
@@ -86,7 +78,7 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
 
 
         
-def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict):
+def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict, wires, graph):
     if(currentFanOut%maxFanOut == 0):
         nBuffers = (int(currentFanOut/maxFanOut))
     else:
@@ -127,13 +119,13 @@ def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter,
     
     #check if we need further buffering levels
     if(nBuffers > maxFanOut):
-        fixByBuffering(instanceName, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict)  
+        fixByBuffering(instanceName, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)  
 
-def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, library):
+def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library):
     copyOfGraph = graph.copy()
     for key in copyOfGraph:
         if(len(graph[key]) > maxFanOut):
-            fixByBuffering(key, len(graph[key]), maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict)
+            fixByBuffering(key, len(graph[key]), maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)
             constructGraph(wires,instancesDict, graph, library)
 
 
@@ -146,11 +138,11 @@ def constructGraph(wires,instancesDict, graph, library):
             if(currentWire[2] == 'output'):
                 outputCell = currentWire
             else:
-                capacitance += getPinCapacitance(currentWire[0], currentWire[1], instancesDict)
+                capacitance += getPinCapacitance(currentWire[0], currentWire[1], instancesDict, library)
         delayColumn = []
         capacitanceColumn = []
         if(len(outputCell) > 0):
-            getColumnDelay(outputCell[0], outputCell[1], instancesDict, delayColumn, capacitanceColumn)
+            getColumnDelay(outputCell[0], outputCell[1], instancesDict, delayColumn, capacitanceColumn, library)
             delay = getDelay(capacitanceColumn,delayColumn, capacitance)
             for currentWire in value:
                 if(currentWire != outputCell):
