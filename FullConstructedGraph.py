@@ -85,7 +85,29 @@ def constructGraph(wires,instancesDict, graph, library):
                     graph[outputCell[0]].append([key, outputCell[1], currentWire[0], currentWire[1], delay])
                 elif ((currentWire == outputCell) & (len(value) == 1)):
                     graph[outputCell[0]].append([key, outputCell[1], 'output cload', 'output pin', delay])
-            
+
+
+def getTotalDelay(graph):
+    totalDelay = 0
+    for key, value in graph.items():
+        maxCurrentEdge = 0
+        for edge in value:
+            #get the weight with the maximum value to represent the delay of the cell
+            maxCurrentEdge = max(maxCurrentEdge, edge[4])
+        totalDelay += maxCurrentEdge
+    return totalDelay
+
+
+def printNumberOfCellsOfEachType(instancesDict):
+    cellsCount = defaultdict(list)
+    
+    for key,value in instancesDict.items():
+        cellsCount[value['cellType']] = cellsCount.get(value['cellType'], 0) + 1
+          
+    for key, value in cellsCount.items():
+        print("Cell: ", key, "- count:",value)
+        
+
 constructGraph(wires,instancesDict, graph, library)
 fixByBuffering('INVX8_1', 10, 3, 2, newWireCounter, newBufferCounter)   
 constructGraph(wires,instancesDict, graph, library)
@@ -100,4 +122,5 @@ for key,value in graph.items():
         print ("Source:", key, "wire:", edge[0], "from pin:", edge[1], "to cell", edge[2], "to pin", edge[3], "with weight = ", edge[4])
 
 
-
+#print(getTotalDelay(graph))
+#printNumberOfCellsOfEachType(instancesDict)
