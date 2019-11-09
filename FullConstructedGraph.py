@@ -16,12 +16,11 @@ library = parse_liberty(open("gscl45nm.lib").read())
 wires = defaultdict(list)
 instancesDict = {}
 graph = defaultdict(list)
-maxFanOut = 3
-newWireCounter = 1
-newBufferCounter = 1
+newWireCounter = [1]
+newBufferCounter = [1]
 parseNetlist("netlist.v", wires, instancesDict)
 
-def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter):
+def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict):
     if(currentFanOut%maxFanOut == 0):
         nBuffers = (int(currentFanOut/maxFanOut))
     else:
@@ -39,14 +38,14 @@ def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBuffe
     counter = 0 #counter for the number of fanout considered
     
     for i in range(nBuffers):
-        bufferInstanceName = "new_buffer_" + str(newBufferCounter)
+        bufferInstanceName = "new_buffer_" + str(newBufferCounter[0])
         wires[graph[key][0][0]].append([bufferInstanceName, 'A', 'input'])
         
         myCurrentInstance = {}
         instanceType = "BUFX" + str(size)
         myCurrentInstance["cellType"] = instanceType
         myCurrentInstance['A'] = graph[key][0][0]
-        myCurrentWire = "new_wire_" + str(newWireCounter)
+        myCurrentWire = "new_wire_" + str(newWireCounter[0])
         myCurrentInstance['Y'] = myCurrentWire
        
         instancesDict[bufferInstanceName] = myCurrentInstance
@@ -55,14 +54,21 @@ def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBuffe
         for j in range(min(maxFanOut,currentFanOut-counter)):
             
             wires[myCurrentWire].append([newWires[counter][0], newWires[counter][1], 'input'])
+            instancesDict[newWires[counter][0]][newWires[counter][1]] = myCurrentWire
             counter += 1
-        newWireCounter += 1
-        newBufferCounter += 1
+        newWireCounter[0] += 1
+        newBufferCounter[0] += 1
     
     #check if we need further buffering levels
     if(nBuffers > maxFanOut):
-        fixByBuffering(key, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter)  
+        fixByBuffering(key, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict)  
 
+def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, library):
+    copyOfGraph = graph.copy()
+    for key in copyOfGraph:
+        if(len(graph[key]) > maxFanOut):
+            fixByBuffering(key, len(graph[key]), maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict)
+            constructGraph(wires,instancesDict, graph, library)
 
 
 def constructGraph(wires,instancesDict, graph, library):
@@ -107,20 +113,18 @@ def printNumberOfCellsOfEachType(instancesDict):
     for key, value in cellsCount.items():
         print("Cell: ", key, "- count:",value)
         
-
-constructGraph(wires,instancesDict, graph, library)
-fixByBuffering('INVX8_1', 10, 3, 2, newWireCounter, newBufferCounter)   
-constructGraph(wires,instancesDict, graph, library)
+#fixByBuffering('INVX8_1', 10, 3, 2, newWireCounter, newBufferCounter)   
+#constructGraph(wires,instancesDict, graph, library)
 """
 for key,value in graph.items():
     currentFanOut = len(value)
     if(currentFanOut > maxFanOut):
         fixByBuffering(key, currentFanOut,maxFanOut)
-        """
+        
 for key,value in graph.items():
     for edge in value:
         print ("Source:", key, "wire:", edge[0], "from pin:", edge[1], "to cell", edge[2], "to pin", edge[3], "with weight = ", edge[4])
-
+"""
 
 #print(getTotalDelay(graph))
 #printNumberOfCellsOfEachType(instancesDict)

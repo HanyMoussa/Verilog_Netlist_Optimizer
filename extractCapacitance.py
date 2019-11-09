@@ -9,20 +9,15 @@ def getDelay(capacitances, delays, target):
     if(target == 0):
         return delays[2]
     else:
-        if((target > capacitances[-1]) | (target < capacitances[0])):
-            extrapolator = UnivariateSpline(capacitances, delays)
-            return max(extrapolator([target]), 0)
+        if((target > capacitances[-1])):
+            slope = (delays[-1] - delays[-2])/(capacitances[-1] - capacitances[-2])
+            c = delays[-1] - slope * capacitances[-1]
+            return slope*target + c
+        elif (target < capacitances[0]):
+            slope = (delays[1] - delays[0])/(capacitances[1] - capacitances[0])
+            c = delays[0] - slope * capacitances[0]
+            return slope*target + c
         else:
             interpolateDelay = scipy.interpolate.interp1d(capacitances, delays)
             return max(interpolateDelay(target), 0)
     
-"""    
-def main():
-    capacitances = [0.04,0.08,0.16,0.4]
-    delays = [0.187081,0.195719,0.216861,0.348891]
-    targetCapacitance = 0.0101035
-    
-    print(getCapacitance(capacitances,delays, targetCapacitance))
-    
-main()
-"""
