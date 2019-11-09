@@ -84,13 +84,13 @@ printNumberOfCellsOfEachType(instancesDict)
 print("-------------------------------------------------------")
 
 """
-#max fanout is 3
-removeViolationsByBuffering(3, graph, wires, instancesDict, library)
+#max fanout is 2
+removeViolationsByBuffering(2, graph, wires, instancesDict, library)
 print("The Graph after fixing Fan Out by Buffering:")
-
 print("total cells delay =:", getTotalDelay(graph))
 printNumberOfCellsOfEachType(instancesDict)
 print("-------------------------------------------------------")
+
 
 updateSizing(wires,instancesDict, graph, library) 
 
@@ -101,10 +101,9 @@ print("-------------------------------------------------------")
 
 for key,value in instancesDict.items():
     pass#displayAsAnInstantiation(key, instancesDict)
-"""
 
-newWireCounter =[1]
-fixByCloning('INVX1_1', instancesDict, len(graph['INVX1_1']), 2, newWireCounter, wires, graph)
+"""
+fixByCloning('DFFPOSX1_1', instancesDict, len(graph['DFFPOSX1_1']), 2, newWireCounter, wires, graph)
 
 
 constructGraph(wires,instancesDict, graph, library)

@@ -47,9 +47,15 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
         myCurrentWire = "new_wire_" + str(newWireCounter[0])
         newWireCounter[0] += 1
         
-        myCurrentInstance['Y'] = myCurrentWire
-        instancesDict[clonedInstanceName] = myCurrentInstance
-        wires[myCurrentWire].append([clonedInstanceName, 'Y', 'output'])
+        if(myCurrentInstance['cellType'][0:3] == "DFF"):
+            myCurrentInstance['Q'] = myCurrentWire
+            instancesDict[clonedInstanceName] = myCurrentInstance
+            wires[myCurrentWire].append([clonedInstanceName, 'Q', 'output'])
+        else:
+            myCurrentInstance['Y'] = myCurrentWire
+            instancesDict[clonedInstanceName] = myCurrentInstance
+            wires[myCurrentWire].append([clonedInstanceName, 'Y', 'output'])
+            
         for key,value in myCurrentInstance.items():
             if(key == 'cellType') | (key == 'Y') | (key == 'Q'):
                 continue
