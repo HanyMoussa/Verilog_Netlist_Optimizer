@@ -20,31 +20,91 @@ newWireCounter = [1]
 newBufferCounter = [1]
 parseNetlist("netlist.v", wires, instancesDict)
 
-def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict):
+
+def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireCounter, wires, graph):
+    if(currentFanOut%maxFanOut == 0):
+        nClones = (int(currentFanOut/maxFanOut) - 1)
+    else:
+        nClones = (int(currentFanOut/maxFanOut))
+        
+    newWires = []
+    
+    for currentWire in wires[graph[instanceName][0][0]]:
+        if(currentWire[2] == 'input'):
+            #wires[graph[instanceName][0][0]].remove(currentWire)
+            newWires.append(currentWire)
+   
+    removeCounter = 0
+    for currentWire in newWires:
+        if(removeCounter >= maxFanOut):
+            wires[graph[instanceName][0][0]].remove(currentWire)
+        removeCounter += 1
+    
+    counter = maxFanOut #counter for the number of clones considered
+    for i in range(nClones):
+        clonedInstanceName = instanceName + '_clone_' + str(i+1)
+        myCurrentInstance = instancesDict[instanceName].copy()
+        myCurrentWire = "new_wire_" + str(newWireCounter[0])
+        newWireCounter[0] += 1
+        
+        myCurrentInstance['Y'] = myCurrentWire
+        instancesDict[clonedInstanceName] = myCurrentInstance
+        wires[myCurrentWire].append([clonedInstanceName, 'Y', 'output'])
+        for key,value in myCurrentInstance.items():
+            if(key == 'cellType') | (key == 'Y') | (key == 'Q'):
+                continue
+            else:
+                wires[value].append([clonedInstanceName, key, 'input'])
+        
+        
+        
+        for j in range(min(maxFanOut,currentFanOut-counter)):
+            wires[myCurrentWire].append([newWires[counter][0], newWires[counter][1], 'input'])
+            instancesDict[newWires[counter][0]][newWires[counter][1]] = myCurrentWire
+            counter += 1
+        
+
+    
+    #check if we need further cloning levels
+    for key,value in instancesDict[instanceName].items():
+        if(key == 'cellType') | (key == 'Y') | (key == 'Q'):
+            continue
+        else:
+            prevFanOut = len(wires[value]) - 1
+            prevCell = -1
+            for item in wires[value]:
+                if(item[2] == 'output'):
+                    prevCell = item[0]
+            if((prevFanOut > maxFanOut) & (prevCell != -1)) :
+                fixByCloning(prevCell, instancesDict, prevFanOut, maxFanOut, newWireCounter, wires, graph)
+
+
+        
+def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict):
     if(currentFanOut%maxFanOut == 0):
         nBuffers = (int(currentFanOut/maxFanOut))
     else:
         nBuffers = (int(currentFanOut/maxFanOut)) + 1
     newWires = []
-    for currentWire in wires[graph[key][0][0]]:
+    for currentWire in wires[graph[instanceName][0][0]]:
         if(currentWire[2] == 'input'):
-            #wires[graph[key][0][0]].remove(currentWire)
+            #wires[graph[instanceName][0][0]].remove(currentWire)
             newWires.append(currentWire)
    
     for currentWire in newWires:
-        wires[graph[key][0][0]].remove(currentWire)
+        wires[graph[instanceName][0][0]].remove(currentWire)
             
             
     counter = 0 #counter for the number of fanout considered
     
     for i in range(nBuffers):
         bufferInstanceName = "new_buffer_" + str(newBufferCounter[0])
-        wires[graph[key][0][0]].append([bufferInstanceName, 'A', 'input'])
+        wires[graph[instanceName][0][0]].append([bufferInstanceName, 'A', 'input'])
         
         myCurrentInstance = {}
         instanceType = "BUFX" + str(size)
         myCurrentInstance["cellType"] = instanceType
-        myCurrentInstance['A'] = graph[key][0][0]
+        myCurrentInstance['A'] = graph[instanceName][0][0]
         myCurrentWire = "new_wire_" + str(newWireCounter[0])
         myCurrentInstance['Y'] = myCurrentWire
        
@@ -61,7 +121,7 @@ def fixByBuffering(key, currentFanOut, maxFanOut, size, newWireCounter, newBuffe
     
     #check if we need further buffering levels
     if(nBuffers > maxFanOut):
-        fixByBuffering(key, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict)  
+        fixByBuffering(instanceName, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict)  
 
 def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, library):
     copyOfGraph = graph.copy()

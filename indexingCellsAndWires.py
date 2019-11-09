@@ -152,7 +152,7 @@ for instanceName in instancesDict.values():
         print(attr, instanceName[attr])
 """
 
-parseNetlist("netlist.v", wires, instancesDict)
+#parseNetlist("netlist.v", wires, instancesDict)
 
 for key,value in wires.items():
     if(len(value) == 1):

@@ -73,8 +73,6 @@ def updateSizing(wires,instancesDict, graph, library):
    
 
 
-
-
 #print(getTotalDelay(graph))
 #printNumberOfCellsOfEachType(instancesDict)
 #print(len(library.get_groups('cell', "OR2X2")))
@@ -85,6 +83,8 @@ print("total cells delay =:", getTotalDelay(graph))
 printNumberOfCellsOfEachType(instancesDict)
 print("-------------------------------------------------------")
 
+"""
+#max fanout is 3
 removeViolationsByBuffering(3, graph, wires, instancesDict, library)
 print("The Graph after fixing Fan Out by Buffering:")
 
@@ -95,6 +95,28 @@ print("-------------------------------------------------------")
 updateSizing(wires,instancesDict, graph, library) 
 
 print("The Graph after Fixing Fanouts by Buffering and Sizing:")
+print("total cells delay =:", getTotalDelay(graph))
+printNumberOfCellsOfEachType(instancesDict)
+print("-------------------------------------------------------")
+
+for key,value in instancesDict.items():
+    pass#displayAsAnInstantiation(key, instancesDict)
+"""
+
+newWireCounter =[1]
+fixByCloning('INVX1_1', instancesDict, len(graph['INVX1_1']), 2, newWireCounter, wires, graph)
+
+
+constructGraph(wires,instancesDict, graph, library)
+print("The Original Graph after Cloning:")
+print("total cells delay =:", getTotalDelay(graph))
+printNumberOfCellsOfEachType(instancesDict)
+print("-------------------------------------------------------")
+
+
+updateSizing(wires,instancesDict, graph, library) 
+
+print("The Graph after Fixing Fanouts by Cloning and Sizing:")
 print("total cells delay =:", getTotalDelay(graph))
 printNumberOfCellsOfEachType(instancesDict)
 print("-------------------------------------------------------")
