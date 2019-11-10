@@ -18,3 +18,7 @@ The library was tested through 8 different verilog netlists including .
 # Built by:
   In order to use parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
+# Contributers:
+  * Ramez Moussa - [Github Profile](https://github.com/ramezmoussa)
+  * Hany Moussa - [Github Profile](https://github.com/hanymoussa)
+  
