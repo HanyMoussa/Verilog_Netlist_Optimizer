@@ -7,10 +7,10 @@ Created on Wed Nov  6 16:24:40 2019
 from collections import defaultdict
 from liberty.parser import parse_liberty
 from liberty.types import select_timing_table
-from indexingCellsAndWires import *
+from parseLibertyAndNetlist import *
 import scipy.interpolate
 from scipy.interpolate import UnivariateSpline
-from extractCapacitance import *
+from extractDelay import *
 
 
 def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireCounter, wires, graph):
