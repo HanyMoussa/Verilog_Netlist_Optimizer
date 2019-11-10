@@ -4,6 +4,8 @@
 import scipy.interpolate
 from scipy.interpolate import UnivariateSpline
 
+#a function that takes the capacitance array and the delays array
+#it interpolates/extrapolates to obtain the delay corresponding to a target capacitance
 def getDelay(capacitances, delays, target):
     # For an output pin, the target capacitance would be 0 so return the 3rd value
     if(target == 0):
