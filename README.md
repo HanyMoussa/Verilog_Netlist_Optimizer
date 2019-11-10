@@ -1,7 +1,7 @@
 # Verilog_Netlist_Optimizer
-A Python library that parses a gate-level netlist and checks for any fanout violations. It provides 2 solutions to solve this issue:
-  1- Through adding Buffers
-  2- Through cloning the cell
+A Python library that parses a gate-level netlist and checks for any fanout violations. It provides 2 solutions to solve this issue:<br />
+  1- Through adding Buffers<br />
+  2- Through cloning the cell<br />
 Additionally, the library provides the functionality to size up cells accordingly to reduce the total delay.
 
 # Installing The Library
