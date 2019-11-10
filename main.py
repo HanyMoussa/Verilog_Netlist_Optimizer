@@ -72,7 +72,7 @@ def displayMenu():
         userMaxFanOut = input()
         
         print("Apply cloning")
-        fixByCloning('DFFPOSX1_1', instancesDict, len(graph['DFFPOSX1_1']), 2, newWireCounter, wires, graph)
+        removeViolationsByCloning(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library)
         constructAndDisplay()
         
         print("Apply sizing")

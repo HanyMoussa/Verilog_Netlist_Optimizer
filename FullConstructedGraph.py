@@ -77,6 +77,16 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
                 fixByCloning(prevCell, instancesDict, prevFanOut, maxFanOut, newWireCounter, wires, graph)
 
 
+
+def removeViolationsByCloning(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library):
+    copyOfGraph = graph.copy()
+    for key in copyOfGraph:
+        if(len(graph[key]) > maxFanOut):
+            fixByCloning(key, instancesDict, len(graph[key]), maxFanOut, newWireCounter, wires, graph)
+            constructGraph(wires,instancesDict, graph, library)
+
+
+
         
 def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict, wires, graph):
     if(currentFanOut%maxFanOut == 0):
