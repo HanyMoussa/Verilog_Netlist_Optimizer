@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov  6 16:24:40 2019
 
-@author: Ramez Moussa
-"""
 from collections import defaultdict
 from liberty.parser import parse_liberty
 from liberty.types import select_timing_table

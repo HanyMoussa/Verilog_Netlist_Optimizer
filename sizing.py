@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov  6 16:24:40 2019
 
-@author: Ramez Moussa
-"""
 from FullConstructedGraph import *
         
 def updateWire(wires, wireName, instance, newInstanceName):

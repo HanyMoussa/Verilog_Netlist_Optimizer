@@ -10,6 +10,7 @@ newWireCounter = [1]
 newBufferCounter = [1]
 netlistUpperSection = [""]
 
+#constructs the graph and displays the number of cells of each type
 def constructAndDisplay():
     constructGraph(wires,instancesDict, graph, library, cload)
     print("The current netlist:")
@@ -18,6 +19,7 @@ def constructAndDisplay():
     printNumberOfCellsOfEachType(instancesDict)
     print("-------------------------------------------------------")
 
+#gets the maximum fanout in a given netlist
 def getCurrentMaxFanOut():
     currentMaxFanOut = 0
     for key,value in graph.items():
@@ -25,6 +27,7 @@ def getCurrentMaxFanOut():
     return currentMaxFanOut
 
 
+#writes the current netlist (potentially optimized) to a the OptimizedNetlist.v file
 def writeToFile():
     f = open("OptimizedNetlist.v","w+")
     f.write(netlistUpperSection[0])
@@ -38,7 +41,8 @@ def displayGraph():
         for edge in value:
             print ("Source:", key, "wire:", edge[0], "from pin:", edge[1], "to cell", edge[2], "to pin", edge[3], "with weight = ", edge[4])
     print("-------------------------------------------------------")
-    
+ 
+#display the main menu with all the options    
 def displayMenu():
     
     print("-------------------------------------------------------")
@@ -105,6 +109,7 @@ def displayMenu():
         print("Wrong input. Please enter a correct number")
         displayMenu()
   
+#Ask the user if they want to reopen the menu or terminate the program
 def reopenMenu():
     print("\nTo end the program press 0")
     print("To reopen the menu for further operations press 1")

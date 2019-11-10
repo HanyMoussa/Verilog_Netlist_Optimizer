@@ -86,12 +86,16 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
                 netlistUpperSection[0] += line
     f.close()
     
+    
+#get the capacitance of a given pin in a cell
 def getPinCapacitance(instanceName, inPin, instancesDict, library):
     cell = library.get_group('cell', instancesDict[instanceName]["cellType"])
     pin = cell.get_group('pin', inPin)
     PINCAPACITANCE = pin['capacitance']
     return PINCAPACITANCE
 
+#get the column from the characterization table containing the delay of a cell using 
+#the third column (as we are assuming the transition time to have the middle value)
 def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitanceColumn, library):
     cellType = instancesDict[instanceName]["cellType"]
     cell = library.get_group('cell', cellType)
@@ -101,22 +105,22 @@ def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitance
         
         time_table_rise=select_timing_table(pin,"CLK","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"CLK","cell_fall").get_array("values")
-        for i in range(4):
+        for i in range(len(time_table_rise)):
             delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
             
         #the index_1 is the same for cell_rise and cell_fall so you could pick either
         cellCapacitanceArray=select_timing_table(pin,"CLK","cell_fall").get_array("index_1")
-        for i in range(4):
+        for i in range(len(cellCapacitanceArray[0])):
             capacitanceColumn.append(cellCapacitanceArray[0][i])
 
     else:
         #for simplicity assume related pin is always A in cells other than FF
         time_table_rise=select_timing_table(pin,"A","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"A","cell_fall").get_array("values")
-        for i in range(4):
+        for i in range(len(time_table_rise)):
             delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
             
         #the index_1 is the same for cell_rise and cell_fall so you could pick either
         cellCapacitanceArray=select_timing_table(pin,"A","cell_fall").get_array("index_1")
-        for i in range(4):
+        for i in range(len(cellCapacitanceArray[0])):
             capacitanceColumn.append(cellCapacitanceArray[0][i])
