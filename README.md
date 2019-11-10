@@ -14,3 +14,7 @@ In order to use the optimizer, run the `main.py` script. Essentially, the librar
 
 # Tests
 The library was tested through 8 different verilog netlists including .
+
+# Built by:
+  In order to use parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
+  
