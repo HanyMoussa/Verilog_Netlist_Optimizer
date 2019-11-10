@@ -8,7 +8,7 @@ instancesDict = {}
 graph = defaultdict(list)
 newWireCounter = [1]
 newBufferCounter = [1]
-
+netlistUpperSection = [""]
 
 def constructAndDisplay():
     constructGraph(wires,instancesDict, graph, library)
@@ -24,6 +24,14 @@ def getCurrentMaxFanOut():
         currentMaxFanOut = max(currentMaxFanOut, len(graph[key]))
     return currentMaxFanOut
 
+
+def writeToFile():
+    f = open("OptimizedNetlist.v","w+")
+    f.write(netlistUpperSection[0])
+    for key,value in instancesDict.items():
+        displayAsAnInstantiation(f, key, instancesDict)
+    print("The optimized netlist has been written successfully to the file: OptimizedNetlist.v")
+    
 def displayMenu():
     
     print("-------------------------------------------------------")
@@ -42,13 +50,16 @@ def displayMenu():
         pass
     elif(choice == '0'):
         print("Reinitialize")
-        parseNetlist("netlist.v", wires, instancesDict, library)
+        parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)
         constructAndDisplay()
         reopenMenu()
         
     elif(choice == '1'):
+        print("Please specify the max fanout for any cell in the netlist")
+        userMaxFanOut = input()
+        
         print("Apply buffering")
-        removeViolationsByBuffering(2, graph, wires, instancesDict, newWireCounter, newBufferCounter, library)       
+        removeViolationsByBuffering(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library)       
         constructAndDisplay()
     
         print("Apply sizing")
@@ -57,6 +68,9 @@ def displayMenu():
         reopenMenu()
     
     elif(choice == '2'):
+        print("Please specify the max fanout for any cell in the netlist")
+        userMaxFanOut = input()
+        
         print("Apply cloning")
         fixByCloning('DFFPOSX1_1', instancesDict, len(graph['DFFPOSX1_1']), 2, newWireCounter, wires, graph)
         constructAndDisplay()
@@ -77,8 +91,7 @@ def displayMenu():
         reopenMenu()
         
     elif(choice == '5'):
-        for key,value in instancesDict.items():
-            displayAsAnInstantiation(key, instancesDict)
+        writeToFile()
             
         reopenMenu()
     else:
@@ -90,7 +103,6 @@ def reopenMenu():
     print("To reopen the menu for further operations press 1")
     
     choice = input()
-    
     if(choice == '-1'):
         pass
     elif(choice == '1'):
@@ -98,7 +110,9 @@ def reopenMenu():
     else:
         print("Wrong input. Please enter a correct number")
         reopenMenu()
-        
-parseNetlist("netlist.v", wires, instancesDict, library)
+
+print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
+netlist = input()
+parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)
 constructAndDisplay()
 displayMenu()
