@@ -49,7 +49,7 @@ Unforunately, our assumptions and the algorithms we utilized have few limitation
   2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires alot of time and memory to provide the results. For example, the testcase with 350 cells took roughly around 7 seconds just for the sizing. This is just a naive approach for sizing just to show its effect on the total delay.
   3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. 
 
-## Built by:
+## Acknowledgement:
   In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
 ## Authors:
