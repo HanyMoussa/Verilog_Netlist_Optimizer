@@ -4,12 +4,12 @@ A Python library that parses a gate-level netlist and checks for any fanout viol
   2- Through cloning the cell<br />
 Additionally, the library provides the functionality to size up cells accordingly to reduce the total delay.
 
-# Installing The Library
+## Installing The Library
    ```
    Clone the Verilog_Netlist_Optimizer Github repository
    Download the library to your machine
    ```
-# Using the library
+## Using the library
 In order to use the optimizer, run the `main.py` script. Essentially, the library has a command line user interface where the user can access all functions.
 
 After parsing the netlist, the user is promted to do one of the following:
@@ -22,10 +22,10 @@ After parsing the netlist, the user is promted to do one of the following:
 ```
 After applying any of the aforementioned functions, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
 
-# Tests
+## Tests
 The library was tested through 8 different ranging from modules with 10 cells to modules with over 350 cells. 
 
-# Files
+## Files
 
 | Module        | Description  |
 | :------------- |:-------------|
@@ -35,10 +35,24 @@ The library was tested through 8 different ranging from modules with 10 cells to
 |sizing.py | This includes the Sizing Function |
 | extractDelay.py | This has a function that interpolates/exterolates the delay for a given capactiance. It must be given the capacitance row and its corresponding delay from the timing table|
 
-# Built by:
+## Assumptions
+During our development, we had to make some assumptions to for the sake of simplicity:
+
+  1. We are assuming that the gate-level netlist would include cells with only 1 output port
+  2. It is assumed that for all cells, the input transision is always the third value in the None Linear Delay Model (NLDM) table. 
+  3. Whenever the load capacitance is outside the provided range in NLDM table, linear extrapolation is utilized.
+  4. We are assuming that the total delays of all cells are representative of the worst-case delay which might not be the case all the time.
+
+## Limitations
+Unforunately, our assumptions and the algorithms we utilized have few limitations:
+  1. As mentioned in the asssumptions, our project might not operate correctly if cells with multiple output ports are used.
+  2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires alot of time and memory to provide the results. For example, the testcase with 350 cells took roughly around 7 seconds just for the sizing. This is just a naive approach for sizing just to show its effect on the total delay.
+  3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. 
+
+## Built by:
   In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
-# Authors:
+## Authors:
   * Ramez Moussa - [Github Profile](https://github.com/ramezmoussa)
   * Hany Moussa - [Github Profile](https://github.com/hanymoussa)
   
