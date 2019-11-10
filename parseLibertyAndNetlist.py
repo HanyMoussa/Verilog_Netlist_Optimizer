@@ -95,7 +95,7 @@ def getPinCapacitance(instanceName, inPin, instancesDict, library):
     return PINCAPACITANCE
 
 #get the column from the characterization table containing the delay of a cell using 
-#the third column (as we are assuming the transition time to have the middle value)
+#the third column (as we are assuming the input transition to have the middle value)
 def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitanceColumn, library):
     cellType = instancesDict[instanceName]["cellType"]
     cell = library.get_group('cell', cellType)

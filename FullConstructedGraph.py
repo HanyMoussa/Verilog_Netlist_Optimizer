@@ -76,7 +76,7 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
 
 
 #this is the generalized function that removes violation via cloning
-#it simply loops over all cells and calles the fixByCloning function
+#it simply loops over all cells and calls the fixByCloning function
 #to fix any individual violation
 def removeViolationsByCloning(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload):
     copyOfGraph = graph.copy()
@@ -131,8 +131,8 @@ def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter,
         fixByBuffering(instanceName, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)  
 
 
-#this is the generalized function that removes violation by cloning
-#it simply loops over all cells and calles the fixByBuffering function
+#this is the generalized function that removes violation by buffering
+#it simply loops over all cells and calls the fixByBuffering function
 #to fix any individual violation
 def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload):
     copyOfGraph = graph.copy()
