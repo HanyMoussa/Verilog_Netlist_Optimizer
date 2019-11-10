@@ -17,7 +17,7 @@ def replaceCell(wires,instancesDict, graph, library, instance, newCellType, cloa
         else:
             myCurrentInstance[attribute] = instancesDict[instance][attribute]
     del instancesDict[instance]
-    newInstanceName = instance + "_sized"
+    newInstanceName = instance + "_s"
     instancesDict[newInstanceName] = myCurrentInstance
     
     # update the wires dictionary
@@ -44,7 +44,7 @@ def updateSizing(wires,instancesDict, graph, library, cload):
             oldDelay = getTotalDelay(graph)
             replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType, cload) #we construct the new graph inside the function
             newDelay = getTotalDelay(graph)
-            currentInstance = currentInstance + "_sized"
+            currentInstance = currentInstance + "_s"
             if(newDelay > oldDelay):
                 newCellType = newCellType[:-1]
                 if(twoDigits == 0):
