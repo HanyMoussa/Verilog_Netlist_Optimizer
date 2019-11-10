@@ -36,7 +36,7 @@ The library was tested through 8 different ranging from modules with 10 cells to
 | extractDelay.py | This has a function that interpolates/exterolates the delay for a given capactiance. It must be given the capacitance row and its corresponding delay from the timing table|
 
 # Built by:
-  In order to use parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
+  In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
 # Authors:
   * Ramez Moussa - [Github Profile](https://github.com/ramezmoussa)
