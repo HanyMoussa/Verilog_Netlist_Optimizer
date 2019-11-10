@@ -12,7 +12,7 @@ def updateWire(wires, wireName, instance, newInstanceName):
             connection[0] = newInstanceName
 
 
-def replaceCell(wires,instancesDict, graph, library, instance, newCellType):
+def replaceCell(wires,instancesDict, graph, library, instance, newCellType, cload):
     myCurrentInstance = {}
     
     # Create new instance where the only difference is the cell type
@@ -30,10 +30,10 @@ def replaceCell(wires,instancesDict, graph, library, instance, newCellType):
         if(attribute != "cellType"):
             updateWire(wires, instancesDict[newInstanceName][attribute], instance, newInstanceName)
     #construct graph with updates
-    constructGraph(wires,instancesDict, graph, library)
+    constructGraph(wires,instancesDict, graph, library, cload)
         
 
-def updateSizing(wires,instancesDict, graph, library):
+def updateSizing(wires,instancesDict, graph, library, cload):
     for instance in graph:
         cellType = instancesDict[instance]["cellType"];
         currentSize = cellType[-1]
@@ -47,19 +47,19 @@ def updateSizing(wires,instancesDict, graph, library):
             twoDigits = 0
         while(len(library.get_groups('cell', newCellType)) == 1):
             oldDelay = getTotalDelay(graph)
-            replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType) #we construct the new graph inside the function
+            replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType, cload) #we construct the new graph inside the function
             newDelay = getTotalDelay(graph)
             currentInstance = currentInstance + "_sized"
             if(newDelay > oldDelay):
                 newCellType = newCellType[:-1]
                 if(twoDigits == 0):
                     newCellType += (str(int(newSize/2)))
-                    replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType)
+                    replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType, cload)
                     break
                 else:
                     newCellType = newCellType[:-1]
                     newCellType += (str(int(newSize/2)))
-                    replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType)
+                    replaceCell(wires,instancesDict, graph, library, currentInstance, newCellType, cload)
                     break
             else: 
                 newCellType = newCellType[:-1]

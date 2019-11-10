@@ -2,7 +2,7 @@ from collections import defaultdict
 from liberty.parser import parse_liberty
 from liberty.types import select_timing_table
 
-#display a cell as an instantiation
+#display a cell from the instances dictionary as an instantiation
 def displayAsAnInstantiation(f, instanceName, instancesDict):
     myCounter = 0
     myInstance = instancesDict[instanceName]
@@ -15,7 +15,15 @@ def displayAsAnInstantiation(f, instanceName, instancesDict):
              f.write (".%s(%s)" % (key, value))
         myCounter += 1
     f.write (" );\n")
-                
+             
+
+#a function that takes a file name for a gatelevel netlist and parses it
+#it initializes the instances dictionary with all the instances created (accessed by instance name)
+#each entry in the instantiations dictionary has all the pins of the cell and the wires connected to them
+#it also initializes the wires dictionary
+#the wires dictionary is accessed using the wire name and gives information about all the cells it is
+#connected to and whether it is the cell's output or input
+#finaly it stores the upper section of the gatelevel netlist so that it is printed later to the final .v file
 def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
     wires.clear()
     instancesDict.clear()
@@ -24,7 +32,7 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
     for line in f:
        # print('\n')
        # print(line)
-        if(line != "\n"):
+        if((line != "\n") & (line != 'endmodule')):
             data = line.split()
             if(data[0] == 'wire'): #identify that we reached the wires section
                 wiresEncountered = 1
@@ -35,10 +43,8 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
                     if(count == 0):
                         cellType = x;
                         myCurrentInstance["cellType"] = cellType
-                       # print("Cell type: ", cellType)
                     elif(count == 1):
                         instanceName = x;
-                      #  print("Instance name: ", instanceName)
                     elif((count > 2) & (count <= len(data) - 2)): #ignore data[2] entry as it is an empty bracket
                         if(x != data[len(data)-2]):
                             if(x[1:4] == "CLK"):
@@ -51,7 +57,6 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
                                 currentWire = x[3:len(x)-2]
                                 currentPin = x[1]
                             myCurrentInstance[currentPin] = currentWire
-                           # print("the", currentPin, "pin", currentWire)
                             
                             cell = library.get_group('cell', cellType)
                             pin = cell.get_group('pin', currentPin)
@@ -69,7 +74,6 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
                                 currentWire = x[3:len(x)-1]
                                 currentPin = x[1]
                             myCurrentInstance[currentPin] = currentWire
-                           # print("the", currentPin, "pin", currentWire)
                             
                             cell = library.get_group('cell', cellType)
                             pin = cell.get_group('pin', currentPin)
@@ -78,8 +82,6 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
                             wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
                     count += 1;
                 instancesDict[instanceName] = myCurrentInstance
-                #print(instancesDict[instanceName])
-                #instancesDict[instanceName]["Q"] = "TRY MODIFY DATA"
             else:
                 netlistUpperSection[0] += line
     f.close()
@@ -102,17 +104,19 @@ def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitance
         for i in range(4):
             delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
             
+        #the index_1 is the same for cell_rise and cell_fall so you could pick either
         cellCapacitanceArray=select_timing_table(pin,"CLK","cell_fall").get_array("index_1")
         for i in range(4):
             capacitanceColumn.append(cellCapacitanceArray[0][i])
 
     else:
-        #for simplicity assume related pin is always A
+        #for simplicity assume related pin is always A in cells other than FF
         time_table_rise=select_timing_table(pin,"A","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"A","cell_fall").get_array("values")
         for i in range(4):
             delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
             
+        #the index_1 is the same for cell_rise and cell_fall so you could pick either
         cellCapacitanceArray=select_timing_table(pin,"A","cell_fall").get_array("index_1")
         for i in range(4):
             capacitanceColumn.append(cellCapacitanceArray[0][i])

@@ -11,7 +11,7 @@ newBufferCounter = [1]
 netlistUpperSection = [""]
 
 def constructAndDisplay():
-    constructGraph(wires,instancesDict, graph, library)
+    constructGraph(wires,instancesDict, graph, library, cload)
     print("The current netlist:")
     print("The maximum fanout in the current netlist is:", getCurrentMaxFanOut())
     print("total cells delay =:", getTotalDelay(graph))
@@ -30,7 +30,14 @@ def writeToFile():
     f.write(netlistUpperSection[0])
     for key,value in instancesDict.items():
         displayAsAnInstantiation(f, key, instancesDict)
+    f.write('endmodule')
     print("The optimized netlist has been written successfully to the file: OptimizedNetlist.v")
+    
+def displayGraph():
+    for key,value in graph.items():
+        for edge in value:
+            print ("Source:", key, "wire:", edge[0], "from pin:", edge[1], "to cell", edge[2], "to pin", edge[3], "with weight = ", edge[4])
+    print("-------------------------------------------------------")
     
 def displayMenu():
     
@@ -59,11 +66,11 @@ def displayMenu():
         userMaxFanOut = input()
         
         print("Apply buffering")
-        removeViolationsByBuffering(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library)       
+        removeViolationsByBuffering(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload)       
         constructAndDisplay()
     
         print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library) 
+        updateSizing(wires,instancesDict, graph, library, cload) 
         constructAndDisplay()
         reopenMenu()
     
@@ -72,22 +79,22 @@ def displayMenu():
         userMaxFanOut = input()
         
         print("Apply cloning")
-        removeViolationsByCloning(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library)
+        removeViolationsByCloning(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload)
         constructAndDisplay()
         
         print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library) 
+        updateSizing(wires,instancesDict, graph, library, cload) 
         constructAndDisplay()
         reopenMenu()
 
     elif(choice == '3'):
         print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library) 
+        updateSizing(wires,instancesDict, graph, library, cload) 
         constructAndDisplay()
         reopenMenu()
         
     elif(choice == '4'):
-        constructAndDisplay()
+        displayGraph()
         reopenMenu()
         
     elif(choice == '5'):
@@ -99,11 +106,11 @@ def displayMenu():
         displayMenu()
   
 def reopenMenu():
-    print("\nTo end the program press -1")
+    print("\nTo end the program press 0")
     print("To reopen the menu for further operations press 1")
     
     choice = input()
-    if(choice == '-1'):
+    if(choice == '0'):
         pass
     elif(choice == '1'):
         displayMenu()
@@ -111,8 +118,14 @@ def reopenMenu():
         print("Wrong input. Please enter a correct number")
         reopenMenu()
 
-print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
-netlist = input()
+#print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
+#netlist = input()
+netlist = 'netlist.v'
+#print("Please input the output load capacitance of the whole module (in fF)")
+#cload = input()
+#cload = float(cload)
+cload = 10
+
 parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)
 constructAndDisplay()
 displayMenu()

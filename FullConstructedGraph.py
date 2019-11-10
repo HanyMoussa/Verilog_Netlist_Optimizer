@@ -13,7 +13,10 @@ from scipy.interpolate import UnivariateSpline
 from extractDelay import *
 
 
+#a function that fixes the fanout of a single cell using cloning
+#also, it is recursively called to fix any violations it might have caused
 def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireCounter, wires, graph):
+    #get the number of clones
     if(currentFanOut%maxFanOut == 0):
         nClones = (int(currentFanOut/maxFanOut) - 1)
     else:
@@ -23,7 +26,6 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
     
     for currentWire in wires[graph[instanceName][0][0]]:
         if(currentWire[2] == 'input'):
-            #wires[graph[instanceName][0][0]].remove(currentWire)
             newWires.append(currentWire)
    
     removeCounter = 0
@@ -38,6 +40,7 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
         myCurrentInstance = instancesDict[instanceName].copy()
         myCurrentWire = "new_wire_" + str(newWireCounter[0])
         newWireCounter[0] += 1
+        
         
         if(myCurrentInstance['cellType'][0:3] == "DFF"):
             myCurrentInstance['Q'] = myCurrentWire
@@ -54,8 +57,7 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
             else:
                 wires[value].append([clonedInstanceName, key, 'input'])
         
-        
-        
+        #asssign a fanout = maxfanout to each cloned cell (unless the remaining is less)
         for j in range(min(maxFanOut,currentFanOut-counter)):
             wires[myCurrentWire].append([newWires[counter][0], newWires[counter][1], 'input'])
             instancesDict[newWires[counter][0]][newWires[counter][1]] = myCurrentWire
@@ -65,29 +67,33 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
     
     #check if we need further cloning levels
     for key,value in instancesDict[instanceName].items():
-        if(key == 'cellType') | (key == 'Y') | (key == 'Q'):
+        #get all cells that are driving our cell
+        if(key == 'cellType') | (key == 'Y') | (key == 'Q'): 
             continue
         else:
-            prevFanOut = len(wires[value]) - 1
+            prevFanOut = len(wires[value]) - 1 #check the new fanout after adding the clones
             prevCell = -1
             for item in wires[value]:
                 if(item[2] == 'output'):
                     prevCell = item[0]
-            if((prevFanOut > maxFanOut) & (prevCell != -1)) :
+            if((prevFanOut > maxFanOut) & (prevCell != -1)) : #if new fanout violates the maximum, recurse
                 fixByCloning(prevCell, instancesDict, prevFanOut, maxFanOut, newWireCounter, wires, graph)
 
 
-
-def removeViolationsByCloning(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library):
+#this is the generalized function that removes violation via cloning
+#it simply loops over all cells and calles the fixByCloning function
+#to fix any individual violation
+def removeViolationsByCloning(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload):
     copyOfGraph = graph.copy()
     for key in copyOfGraph:
         if(len(graph[key]) > maxFanOut):
             fixByCloning(key, instancesDict, len(graph[key]), maxFanOut, newWireCounter, wires, graph)
-            constructGraph(wires,instancesDict, graph, library)
+            constructGraph(wires,instancesDict, graph, library, cload)
 
 
 
-        
+#a function that fixes the fanout of a single cell by adding buffers
+#also, it is recursively called to fix any violations it might have caused    
 def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict, wires, graph):
     if(currentFanOut%maxFanOut == 0):
         nBuffers = (int(currentFanOut/maxFanOut))
@@ -96,7 +102,6 @@ def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter,
     newWires = []
     for currentWire in wires[graph[instanceName][0][0]]:
         if(currentWire[2] == 'input'):
-            #wires[graph[instanceName][0][0]].remove(currentWire)
             newWires.append(currentWire)
    
     for currentWire in newWires:
@@ -117,7 +122,6 @@ def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter,
         myCurrentInstance['Y'] = myCurrentWire
        
         instancesDict[bufferInstanceName] = myCurrentInstance
-        #displayAsAnInstantiation(bufferInstanceName, instancesDict)
         wires[myCurrentWire].append([bufferInstanceName, 'Y', 'output'])
         for j in range(min(maxFanOut,currentFanOut-counter)):
             
@@ -131,29 +135,36 @@ def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter,
     if(nBuffers > maxFanOut):
         fixByBuffering(instanceName, nBuffers, maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)  
 
-def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library):
+
+#this is the generalized function that removes violation by cloning
+#it simply loops over all cells and calles the fixByBuffering function
+#to fix any individual violation
+def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload):
     copyOfGraph = graph.copy()
     for key in copyOfGraph:
         if(len(graph[key]) > maxFanOut):
             fixByBuffering(key, len(graph[key]), maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)
-            constructGraph(wires,instancesDict, graph, library)
+            constructGraph(wires,instancesDict, graph, library, cload)
 
 
-def constructGraph(wires,instancesDict, graph, library):
+#this function uses the wires list to construct the graph
+#while doing so, it takes into consideration the fanout of each cell
+#and calculates the delay of each cell
+def constructGraph(wires,instancesDict, graph, library, cload):
     graph.clear()
     for key,value in wires.items():
         capacitance = 0
         outputCell = []
-        for currentWire in value:
-            if(currentWire[2] == 'output'):
+        for currentWire in value: 
+            if(currentWire[2] == 'output'): #identify the cell producing this wire
                 outputCell = currentWire
-            else:
+            else: #add the capacitances of all other cells connected to that wire
                 capacitance += getPinCapacitance(currentWire[0], currentWire[1], instancesDict, library)
         delayColumn = []
         capacitanceColumn = []
         if(len(outputCell) > 0):
             getColumnDelay(outputCell[0], outputCell[1], instancesDict, delayColumn, capacitanceColumn, library)
-            delay = getDelay(capacitanceColumn,delayColumn, capacitance)
+            delay = getDelay(capacitanceColumn,delayColumn, capacitance, cload)
             for currentWire in value:
                 if(currentWire != outputCell):
                     graph[outputCell[0]].append([key, outputCell[1], currentWire[0], currentWire[1], delay])
@@ -161,6 +172,9 @@ def constructGraph(wires,instancesDict, graph, library):
                     graph[outputCell[0]].append([key, outputCell[1], 'output cload', 'output pin', delay])
 
 
+#this cell iterates over all the cells (using the graph)
+#and sums the delays of all the cells 
+#(it only considers the maximum delay of each individual cell)
 def getTotalDelay(graph):
     totalDelay = 0
     for key, value in graph.items():
@@ -172,7 +186,10 @@ def getTotalDelay(graph):
     return totalDelay
 
 
+#This function counts the number of cells of each type and prints them
 def printNumberOfCellsOfEachType(instancesDict):
+    
+    #a dictionary to keep count of the number of each cell used
     cellsCount = defaultdict(list)
     
     for key,value in instancesDict.items():
@@ -180,19 +197,4 @@ def printNumberOfCellsOfEachType(instancesDict):
           
     for key, value in cellsCount.items():
         print("Cell: ", key, "- count:",value)
-        
-#fixByBuffering('INVX8_1', 10, 3, 2, newWireCounter, newBufferCounter)   
-#constructGraph(wires,instancesDict, graph, library)
-"""
-for key,value in graph.items():
-    currentFanOut = len(value)
-    if(currentFanOut > maxFanOut):
-        fixByBuffering(key, currentFanOut,maxFanOut)
-        
-for key,value in graph.items():
-    for edge in value:
-        print ("Source:", key, "wire:", edge[0], "from pin:", edge[1], "to cell", edge[2], "to pin", edge[3], "with weight = ", edge[4])
-"""
 
-#print(getTotalDelay(graph))
-#printNumberOfCellsOfEachType(instancesDict)
