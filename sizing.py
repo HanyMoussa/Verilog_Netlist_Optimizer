@@ -1,7 +1,7 @@
 
 from FullConstructedGraph import *
  
-# a function that updates a wire by replacing the   
+# a function that updates a wire by replacing the old instance name by the new one  
 def updateWire(wires, wireName, instance, newInstanceName):
     for connection in wires[wireName]:
         if(connection[0] == instance):

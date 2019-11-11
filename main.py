@@ -84,14 +84,7 @@ def displayMenu(netlist):
         userMaxFanOut = input()
         
         print("Apply cloning")
-        #while True:
-            #currentCounter = newWireCounter[0]
-            #copyGraph = graph.copy()
         removeViolationsByCloning(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload, newClonesCounter)
-           # if(currentCounter == newWireCounter[0]):
-           #     break
-            #else:
-             #   copyGraph = graph
         constructAndDisplay()
         reopenMenu()
 
