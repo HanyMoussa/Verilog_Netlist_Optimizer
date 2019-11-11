@@ -106,7 +106,7 @@ def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitance
         time_table_rise=select_timing_table(pin,"CLK","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"CLK","cell_fall").get_array("values")
         for i in range(len(time_table_rise)):
-            delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
+            delayColumn.append(max(time_table_rise[i][1],time_table_fall[i][1]))
             
         #the index_1 is the same for cell_rise and cell_fall so you could pick either
         cellCapacitanceArray=select_timing_table(pin,"CLK","cell_fall").get_array("index_1")
@@ -118,7 +118,7 @@ def getColumnDelay(instanceName, outPin, instancesDict, delayColumn, capacitance
         time_table_rise=select_timing_table(pin,"A","cell_rise").get_array("values")
         time_table_fall=select_timing_table(pin,"A","cell_fall").get_array("values")
         for i in range(len(time_table_rise)):
-            delayColumn.append(max(time_table_rise[i][2],time_table_fall[i][2]))
+            delayColumn.append(max(time_table_rise[i][1],time_table_fall[i][1]))
             
         #the index_1 is the same for cell_rise and cell_fall so you could pick either
         cellCapacitanceArray=select_timing_table(pin,"A","cell_fall").get_array("index_1")
