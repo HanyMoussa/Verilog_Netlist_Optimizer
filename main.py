@@ -16,7 +16,7 @@ newClonesCounter = [1]
 def constructAndDisplay():
     constructGraph(wires,instancesDict, graph, library, cload)
     print("The current netlist:")
-    print("The maximum fanout in the current netlist is:", getCurrentMaxFanOut(maxInstanceName), maxInstanceName)
+    print("The maximum fanout in the current netlist is:", getCurrentMaxFanOut(maxInstanceName))
     print("total cells delay =:", getTotalDelay(graph))
     printNumberOfCellsOfEachType(instancesDict)
     print("-------------------------------------------------------")
@@ -51,20 +51,20 @@ def displayGraph():
 def displayMenu(netlist):
     
     print("-------------------------------------------------------")
-    print("to end the program press -1")
-    print("to reinitialize the data structure using the original netlist press 0")
+    print("to end the program press 0")
+    print("to reinitialize the data structure using the original netlist press r")
     print("to apply buffering press 1")
-    print("to apply cloning press 2")
-    print("to apply sizing press 3")
-    print("(Note that you sizing is applied automatically after buffering and cloning to improve the total delay)")
-    print("To display the netlist graph press 4")
-    print("To write the current verilog netlist to a .v file press 5")
+    print("to apply cloning press 2 (recursive version)")
+    print("to apply cloning press 3 (iterative version)")
+    print("to apply sizing press 4")
+    print("To display the netlist graph press 5")
+    print("To write the current verilog netlist to a .v file press 6")
     print("-------------------------------------------------------")
     
     choice = input()
-    if(choice == '-1'):
+    if(choice == '0'):
         pass
-    elif(choice == '0'):
+    elif(choice == 'r'):
         print("Reinitialize")
         parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)
         constructAndDisplay()
@@ -76,10 +76,6 @@ def displayMenu(netlist):
         
         print("Apply buffering")
         removeViolationsByBuffering(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload)       
-        constructAndDisplay()
-    
-        print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library, cload) 
         constructAndDisplay()
         reopenMenu()
     
@@ -97,27 +93,23 @@ def displayMenu(netlist):
             #else:
              #   copyGraph = graph
         constructAndDisplay()
-        
-        print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library, cload) 
-        constructAndDisplay()
         reopenMenu()
 
-    elif(choice == '3'):
+    elif(choice == '4'):
         print("Apply sizing")
         updateSizing(wires,instancesDict, graph, library, cload) 
         constructAndDisplay()
-        reopenMenu()
-        
-    elif(choice == '4'):
-        displayGraph()
         reopenMenu()
         
     elif(choice == '5'):
+        displayGraph()
+        reopenMenu()
+        
+    elif(choice == '6'):
         writeToFile(netlist)
             
         reopenMenu()
-    elif(choice == '6'):
+    elif(choice == '3'):
         print("Please specify the max fanout for any cell in the netlist")
         userMaxFanOut = input()
         
@@ -125,11 +117,6 @@ def displayMenu(netlist):
         while (getCurrentMaxFanOut(maxInstanceName) > int(userMaxFanOut)):
             fixByCloningSingle(maxInstanceName[0], instancesDict, len(graph[maxInstanceName[0]]), int(userMaxFanOut), newWireCounter, wires, graph, library, cload, newClonesCounter)
             constructGraph(wires,instancesDict, graph, library, cload)  
-        constructAndDisplay()
-        reopenMenu()
-    elif(choice == '7'):
-        fixByCloningSingle(maxInstanceName[0], instancesDict, len(graph[maxInstanceName[0]]), 5, newWireCounter, wires, graph, library, cload, newClonesCounter)
-        constructGraph(wires,instancesDict, graph, library, cload)
         constructAndDisplay()
         reopenMenu()
     else:
