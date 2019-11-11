@@ -138,8 +138,7 @@ def reopenMenu():
         reopenMenu()
 
 print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
-#netlist = input()
-netlist = 'rca4.rtlnopwr.v'
+netlist = input()
 
 cload = 100     # we are assuming that the load capacitance is 100
 
