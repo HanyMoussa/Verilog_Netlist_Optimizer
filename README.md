@@ -5,10 +5,9 @@ A Python library that parses a gate-level netlist and checks for any fanout viol
 Additionally, the library provides the functionality to size up cells accordingly to reduce the total delay.
 
 ## Installing The Library
-   ```
-   Clone the Verilog_Netlist_Optimizer Github repository
-   Download the library to your machine
-   ```
+   The project includes all necessary libraries for it to run. The user does not to have to include any external resources. To install the Verilog Netlist Optimizer you only need to clone the repository through:
+   `git clone https://github.com/HanyMoussa/Verilog_Netlist_Optimizer`
+
 ## Using the library
 In order to use the optimizer, run the `main.py` script. You will be asked to input the name of the verilog netlist, which has to be in the same folder as the `main.py`. Aftwards, the a command line user interface gets displayed where the user can access all functions.
 
