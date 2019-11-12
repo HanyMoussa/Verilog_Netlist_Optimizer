@@ -23,7 +23,7 @@ After parsing the netlist, the user is promted to do one of the following:
 After applying any of the aforementioned functions, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
 
 ## Tests
-The library was tested through 8 different ranging from modules with 10 cells to modules with over 350 cells. 
+The project was tested through 11 tests on 5 different netlists ranging from modules with 2 cells to modules with over 2000 cells. 
 
 ## Files
 
@@ -42,12 +42,13 @@ During our development, we had to make some assumptions to for the sake of simpl
   2. It is assumed that for all cells, the input transision is always the third value in the None Linear Delay Model (NLDM) table. 
   3. Whenever the load capacitance is outside the provided range in NLDM table, linear extrapolation is utilized.
   4. We are assuming that the total delays of all cells are representative of the worst-case delay which might not be the case all the time.
+  5. Another assumption we made was that the output delay of any cell was relative to the first input pin.
 
 ## Limitations
 Unforunately, our assumptions and the algorithms we utilized have few limitations:
   1. As mentioned in the asssumptions, our project might not operate correctly if cells with multiple output ports are used.
-  2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires alot of time and memory to provide the results. For example, the testcase with 350 cells took roughly around 7 seconds just for the sizing. This is just a naive approach for sizing just to show its effect on the total delay.
-  3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. 
+  2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires a lot of time and memory to provide the results. This is just a naive approach for sizing just to show its effect on the total delay.
+  3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. To solve this, we added an iterative version of the algorithm.
 
 ## Acknowledgement:
   In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
