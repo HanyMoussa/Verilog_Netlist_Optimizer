@@ -1,6 +1,7 @@
 
 from sizing import *
 from FullConstructedGraph import *
+from pathlib import Path
 
 library = parse_liberty(open("osu035.lib").read())
 wires = defaultdict(list)
@@ -165,9 +166,14 @@ def reopenMenu():
     else:
         print("Wrong input. Please enter a correct number")
         reopenMenu()
-
+        
 print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
-netlist = input()
+while True:
+    netlist = input()
+    myFile = Path(netlist)
+    if(myFile.is_file()):
+        break
+    print("Please reinput a valid file name or path")
 cload = 100     # we are assuming that the load capacitance is 100
 
 parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)

@@ -30,60 +30,59 @@ def parseNetlist(fileName, wires, instancesDict, library, netlistUpperSection):
     f = open(fileName, "r")
     wiresEncountered = 0
     for line in f:
-       # print('\n')
-       # print(line)
-        if((line != "\n") & (line != 'endmodule')):
-            data = line.split()
-            if(data[0] == 'wire'): #identify that we reached the wires section
-                wiresEncountered = 1
-            if(wiresEncountered == 1) & (data[0] != 'wire'): #identify that we finished the wires section
-                count = 0
-                myCurrentInstance = {}
-                for x in data:
-                    if(count == 0):
-                        cellType = x;
-                        myCurrentInstance["cellType"] = cellType
-                    elif(count == 1):
-                        instanceName = x;
-                    elif((count > 2) & (count <= len(data) - 2)): #ignore data[2] entry as it is an empty bracket
-                        if(x != data[len(data)-2]):
-                            if(x[1:4] == "CLK"):
-                                currentWire = x[5:len(x)-2]
-                                currentPin = x[1:4]
-                            elif((x[1:3] == "YS") | (x[1:3] == "YC")):
-                                currentWire = x[4:len(x)-2]
-                                currentPin = x[1:3]
+        data = line.split()
+        if(len(data) > 0):
+            if((line != "\n") & (data[0] != 'endmodule')):
+                if(data[0] == 'wire'): #identify that we reached the wires section
+                    wiresEncountered = 1
+                if(wiresEncountered == 1) & (data[0] != 'wire'): #identify that we finished the wires section
+                    count = 0
+                    myCurrentInstance = {}
+                    for x in data:
+                        if(count == 0):
+                            cellType = x;
+                            myCurrentInstance["cellType"] = cellType
+                        elif(count == 1):
+                            instanceName = x;
+                        elif((count > 2) & (count <= len(data) - 2)): #ignore data[2] entry as it is an empty bracket
+                            if(x != data[len(data)-2]):
+                                if(x[1:4] == "CLK"):
+                                    currentWire = x[5:len(x)-2]
+                                    currentPin = x[1:4]
+                                elif((x[1:3] == "YS") | (x[1:3] == "YC")):
+                                    currentWire = x[4:len(x)-2]
+                                    currentPin = x[1:3]
+                                else:
+                                    currentWire = x[3:len(x)-2]
+                                    currentPin = x[1]
+                                myCurrentInstance[currentPin] = currentWire
+                                
+                                cell = library.get_group('cell', cellType)
+                                pin = cell.get_group('pin', currentPin)
+                                PINDIRECTION = pin['direction']
+                                
+                                wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
                             else:
-                                currentWire = x[3:len(x)-2]
-                                currentPin = x[1]
-                            myCurrentInstance[currentPin] = currentWire
-                            
-                            cell = library.get_group('cell', cellType)
-                            pin = cell.get_group('pin', currentPin)
-                            PINDIRECTION = pin['direction']
-                            
-                            wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
-                        else:
-                            if(x[1:4] == "CLK"):
-                                currentWire = x[5:len(x)-1]
-                                currentPin = x[1:4]
-                            elif((x[1:3] == "YS") | (x[1:3] == "YC")):
-                                currentWire = x[4:len(x)-1]
-                                currentPin = x[1:3]
-                            else:
-                                currentWire = x[3:len(x)-1]
-                                currentPin = x[1]
-                            myCurrentInstance[currentPin] = currentWire
-                            
-                            cell = library.get_group('cell', cellType)
-                            pin = cell.get_group('pin', currentPin)
-                            PINDIRECTION = pin['direction']
-                            
-                            wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
-                    count += 1;
-                instancesDict[instanceName] = myCurrentInstance
-            else:
-                netlistUpperSection[0] += line
+                                if(x[1:4] == "CLK"):
+                                    currentWire = x[5:len(x)-1]
+                                    currentPin = x[1:4]
+                                elif((x[1:3] == "YS") | (x[1:3] == "YC")):
+                                    currentWire = x[4:len(x)-1]
+                                    currentPin = x[1:3]
+                                else:
+                                    currentWire = x[3:len(x)-1]
+                                    currentPin = x[1]
+                                myCurrentInstance[currentPin] = currentWire
+                                
+                                cell = library.get_group('cell', cellType)
+                                pin = cell.get_group('pin', currentPin)
+                                PINDIRECTION = pin['direction']
+                                
+                                wires[currentWire].append([instanceName, currentPin, PINDIRECTION])
+                        count += 1;
+                    instancesDict[instanceName] = myCurrentInstance
+                else:
+                    netlistUpperSection[0] += line
     f.close()
     
     
