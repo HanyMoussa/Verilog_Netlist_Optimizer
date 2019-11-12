@@ -4,9 +4,24 @@ A Python library that parses a gate-level netlist and checks for any fanout viol
   2- Through cloning the cell<br />
 Additionally, the library provides the functionality to size up cells accordingly to reduce the total delay.
 
-## Installing The Library
-   The project includes all necessary libraries for it to run. The user does not to have to include any external resources. To install the Verilog Netlist Optimizer you only need to clone the repository through: <br />
-   `git clone https://github.com/HanyMoussa/Verilog_Netlist_Optimizer`
+## Dependancies:
+  The project has 3 main dependancies:
+  
+  1- In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
+  
+  2- The Liberty parser is dependent on [Lark](https://github.com/lark-parser/lark) and consequently, we had to install it in order to use the liberty parser.
+  
+  3- We are using the [scipy.interpolate](https://docs.scipy.org/doc/scipy/reference/interpolate.html) library to handle the interpolation and extrapolation of the delays whenever they are not available in the table. To use it, we had to install numpy, scipy and sympy.
+
+## Build Instructions:
+   To install the library run the following commands: 
+   ```
+   pip install lark
+   pip install numpy
+   pip install sympy
+   pip install scipy
+   git clone https://github.com/HanyMoussa/Verilog_Netlist_Optimizer
+   ```
 
 ## Using the library
 In order to use the optimizer, run the `main.py` script. You will be asked to input the name of the verilog netlist, which has to be in the same folder as the `main.py`. Aftwards, the a command line user interface gets displayed where the user can access all functions.
@@ -53,12 +68,6 @@ Unforunately, our assumptions and the algorithms we utilized have some limitatio
   2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires a lot of time and memory to provide the results. This is just a naive approach for sizing just to show its effect on the total delay.
   3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. To solve this, we added an iterative version of the algorithm.
 
-## Dependancies:
-  The project has 2 main dependancies:
-  
-  1- In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
-  
-  2- The Liberty parser is dependent on [Lark](https://github.com/lark-parser/lark) and consequently, we had to install it in order to use the liberty parser.
 ## Acknowledgement:
   This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo under the supervision of Doctor Mohamed Shalan.
   
