@@ -18,10 +18,13 @@ The functions the library provides are the following:
   2- Apply the recursive cloning algorithm and specify the maximum fanout
   3- Apply the iterative cloning algorithm and specify the maximum fanout
   4- Apply sizing to optimize the total delay.
-  5- Display the netlist as a graph
-  6- Write the optimized gate-level netlist to a textfile
+  5- Apply Buffering to a single cell in the netlist
+  6- Apply Cloning to a single cell in the netlist 
+  7- Display the netlist as a graph
+  8- Display the cells and their fanouts
+  9- Write the optimized gate-level netlist to a textfile
 ```
-After applying any of the aforementioned functions, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
+After applying any of functions 1-5, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
 
 ## Tests
 The project was tested through 11 tests on 5 different netlists ranging from modules with 2 cells to modules with over 2000 cells. These tests can be found inside the Examples folder where netlists, schematics and screenshots are present.
