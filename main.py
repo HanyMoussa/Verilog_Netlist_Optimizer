@@ -24,9 +24,10 @@ def constructAndDisplay():
 #gets the maximum fanout in a given netlist
 def getCurrentMaxFanOut(maxInstanceName):
     currentMaxFanOut = 0
-    for key,value in graph.items():
-        if(currentMaxFanOut <  len(graph[key])):
-            currentMaxFanOut = len(graph[key])
+    for key,value in instancesDict.items():
+        currentCellOutputWire = getSourceOfWire(instancesDict, key)
+        if(currentMaxFanOut <  (len(wires[currentCellOutputWire]) - 1)):
+            currentMaxFanOut = (len(wires[currentCellOutputWire]) - 1)
             maxInstanceName[0] = key
     return currentMaxFanOut
 
@@ -47,6 +48,10 @@ def displayGraph():
             print ("Source:", key, "wire:", edge[0], "from pin:", edge[1], "to cell", edge[2], "to pin", edge[3], "with weight = ", edge[4])
     print("-------------------------------------------------------")
  
+def displayCells():
+    for key,value in instancesDict.items():
+        currentCellOutputWire = getSourceOfWire(instancesDict, key)
+        print("Cell:", key, "- fanout:", len(wires[currentCellOutputWire]) -1)
 #display the main menu with all the options    
 def displayMenu(netlist):
     
@@ -87,10 +92,21 @@ def displayMenu(netlist):
         removeViolationsByCloning(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload, newClonesCounter)
         constructAndDisplay()
         reopenMenu()
-
+    elif(choice == '3'):
+        print("Please specify the max fanout for any cell in the netlist")
+        userMaxFanOut = input()
+        
+        print("Apply cloning")
+        while (getCurrentMaxFanOut(maxInstanceName) > int(userMaxFanOut)):
+            fixByCloningSingle(maxInstanceName[0], instancesDict, getCurrentMaxFanOut(maxInstanceName), int(userMaxFanOut), newWireCounter, wires, graph, library, cload, newClonesCounter)
+        constructAndDisplay()
+        reopenMenu()
+        
     elif(choice == '4'):
+        print("Please specify the minimum fanout of cells to be sized")
+        fanout = input()
         print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library, cload) 
+        updateSizing(wires,instancesDict, graph, library, cload, fanout) 
         constructAndDisplay()
         reopenMenu()
         
@@ -98,19 +114,34 @@ def displayMenu(netlist):
         displayGraph()
         reopenMenu()
         
+    elif(choice == '7'):
+        print("Please enter the name of the instance you want to clone (applied to one cell)")
+        instanceName = input()
+        print("Please specify its maximum fanout")
+        fanout = input()
+        currentCellOutputWire = getSourceOfWire(instancesDict, instanceName)
+        fixByCloningSingle(instanceName, instancesDict, len(wires[currentCellOutputWire]) - 1, int(fanout), newWireCounter, wires, graph, library, cload, newClonesCounter)
+        constructAndDisplay()
+        reopenMenu()
+        
+    elif(choice == '8'):
+        print("Please enter the name of the instance you want to buffer (applied to one cell)")
+        instanceName = input()
+        print("Please specify its maximum fanout")
+        fanout = input()
+        currentCellOutputWire = getSourceOfWire(instancesDict, instanceName)
+        fixByBuffering(instanceName, len(wires[currentCellOutputWire]) - 1, int(fanout), 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)
+        constructAndDisplay()
+        reopenMenu()
+        
+    elif(choice == '9'):
+        displayCells()
+        print(getCurrentMaxFanOut(maxInstanceName), maxInstanceName)
+        reopenMenu()
+        
     elif(choice == '6'):
         writeToFile(netlist)
             
-        reopenMenu()
-    elif(choice == '3'):
-        print("Please specify the max fanout for any cell in the netlist")
-        userMaxFanOut = input()
-        
-        print("Apply cloning")
-        while (getCurrentMaxFanOut(maxInstanceName) > int(userMaxFanOut)):
-            fixByCloningSingle(maxInstanceName[0], instancesDict, len(graph[maxInstanceName[0]]), int(userMaxFanOut), newWireCounter, wires, graph, library, cload, newClonesCounter)
-            constructGraph(wires,instancesDict, graph, library, cload)  
-        constructAndDisplay()
         reopenMenu()
     else:
         print("Wrong input. Please enter a correct number")
@@ -131,8 +162,8 @@ def reopenMenu():
         reopenMenu()
 
 print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
-netlist = input()
-
+#netlist = input()
+netlist = 'testcase1.v'
 cload = 100     # we are assuming that the load capacitance is 100
 
 parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)
