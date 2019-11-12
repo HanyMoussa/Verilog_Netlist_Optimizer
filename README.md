@@ -18,10 +18,13 @@ The functions the library provides are the following:
   2- Apply the recursive cloning algorithm and specify the maximum fanout
   3- Apply the iterative cloning algorithm and specify the maximum fanout
   4- Apply sizing to optimize the total delay.
-  5- Display the netlist as a graph
-  6- Write the optimized gate-level netlist to a textfile
+  5- Apply Buffering to a single cell in the netlist
+  6- Apply Cloning to a single cell in the netlist 
+  7- Display the netlist as a graph
+  8- Display the cells and their fanouts
+  9- Write the optimized gate-level netlist to a textfile
 ```
-After applying any of the aforementioned functions, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
+After applying any of functions 1-5, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
 
 ## Tests
 The project was tested through 11 tests on 5 different netlists ranging from modules with 2 cells to modules with over 2000 cells. These tests can be found inside the Examples folder where netlists, schematics and screenshots are present.
@@ -51,10 +54,12 @@ Unforunately, our assumptions and the algorithms we utilized have few limitation
   2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires a lot of time and memory to provide the results. This is just a naive approach for sizing just to show its effect on the total delay.
   3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. To solve this, we added an iterative version of the algorithm.
 
+## Dependancies:
+  The project has 2 main dependancies:
+  1- In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
+  2- The Liberty parser is dependent on [Lark](https://github.com/lark-parser/lark) and consequently, we had to install it in order to use the liberty parser.
 ## Acknowledgement:
   This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo.
-  
-  In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
 ## Authors:
   * Ramez Moussa - [Github Profile](https://github.com/ramezmoussa)
