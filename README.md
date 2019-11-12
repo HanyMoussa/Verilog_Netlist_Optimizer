@@ -51,6 +51,7 @@ Unforunately, our assumptions and the algorithms we utilized have few limitation
   3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. To solve this, we added an iterative version of the algorithm.
 
 ## Acknowledgement:
+  This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo.
   In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
 ## Authors:
