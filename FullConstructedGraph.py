@@ -7,11 +7,21 @@ import scipy.interpolate
 from scipy.interpolate import UnivariateSpline
 from extractDelay import *
 
+def getSourceOfWire(instancesDict, instanceName):
+    if(instancesDict[instanceName]['cellType'][0:3] == "DFF"):
+        return instancesDict[instanceName]['Q']
+    else:
+        #we are only considering single output cells
+        return instancesDict[instanceName]['Y']
 
 #a function that fixes the fanout of a single cell using cloning
 #also, it is recursively called to fix any violations it might have caused
 def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireCounter, wires, graph, library, cload, newClonesCounter):
     #get the number of clones
+    
+    
+    currentCellOutputWire = getSourceOfWire(instancesDict,instanceName)
+    
     if(currentFanOut%maxFanOut == 0):
         nClones = (int(currentFanOut/maxFanOut) - 1)
     else:
@@ -19,14 +29,14 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
         
     newWires = []
     
-    for currentWire in wires[graph[instanceName][0][0]]:
+    for currentWire in wires[currentCellOutputWire]:
         if(currentWire[2] == 'input'):
             newWires.append(currentWire)
-   
+     
     removeCounter = 0
     for currentWire in newWires:
         if(removeCounter >= maxFanOut):
-            wires[graph[instanceName][0][0]].remove(currentWire)
+            wires[currentCellOutputWire].remove(currentWire)
         removeCounter += 1
     
     counter = maxFanOut #counter for the number of clones considered
@@ -55,6 +65,7 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
         
         #asssign a fanout = maxfanout to each cloned cell (unless the remaining is less)
         for j in range(min(maxFanOut,currentFanOut-counter)):
+            
             wires[myCurrentWire].append([newWires[counter][0], newWires[counter][1], 'input'])
             instancesDict[newWires[counter][0]][newWires[counter][1]] = myCurrentWire
             counter += 1
@@ -73,12 +84,14 @@ def fixByCloning(instanceName, instancesDict, currentFanOut, maxFanOut, newWireC
                 if(item[2] == 'output'):
                     prevCell = item[0]
             if((prevFanOut > maxFanOut) & (prevCell != -1)) : #if new fanout violates the maximum, recurse
-                constructGraph(wires,instancesDict, graph, library, cload)
+                #constructGraph(wires,instancesDict, graph, library, cload)
                 fixByCloning(prevCell, instancesDict, prevFanOut, maxFanOut, newWireCounter, wires, graph, library, cload, newClonesCounter)
 
 
 
 def fixByCloningSingle(instanceName, instancesDict, currentFanOut, maxFanOut, newWireCounter, wires, graph, library, cload, newClonesCounter):
+    currentCellOutputWire = getSourceOfWire(instancesDict,instanceName)
+    
     #get the number of clones
     if(currentFanOut%maxFanOut == 0):
         nClones = (int(currentFanOut/maxFanOut) - 1)
@@ -87,14 +100,14 @@ def fixByCloningSingle(instanceName, instancesDict, currentFanOut, maxFanOut, ne
         
     newWires = []
     
-    for currentWire in wires[graph[instanceName][0][0]]:
+    for currentWire in wires[currentCellOutputWire]:
         if(currentWire[2] == 'input'):
             newWires.append(currentWire)
    
     removeCounter = 0
     for currentWire in newWires:
         if(removeCounter >= maxFanOut):
-            wires[graph[instanceName][0][0]].remove(currentWire)
+            wires[currentCellOutputWire].remove(currentWire)
         removeCounter += 1
     
     counter = maxFanOut #counter for the number of clones considered
@@ -136,41 +149,42 @@ def fixByCloningSingle(instanceName, instancesDict, currentFanOut, maxFanOut, ne
 def removeViolationsByCloning(maxFanOut, graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload, newClonesCounter):
     copyOfGraph = graph.copy()
     for key in copyOfGraph:
-        if(len(graph[key]) > maxFanOut):
-          
+        currentCellOutputWire = getSourceOfWire(instancesDict,key)
+        if(len(wires[currentCellOutputWire]) - 1 > maxFanOut):        
             fixByCloning(key, instancesDict, len(graph[key]), maxFanOut, newWireCounter, wires, graph, library, cload, newClonesCounter)
-            constructGraph(wires,instancesDict, graph, library, cload)
+            #constructGraph(wires,instancesDict, graph, library, cload)
             
-        
 
 
 
 #a function that fixes the fanout of a single cell by adding buffers
 #also, it is recursively called to fix any violations it might have caused    
-def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict, wires, graph):
+def fixByBuffering(instanceName, currentFanOut, maxFanOut, size, newWireCounter, newBufferCounter, instancesDict, wires, graph):   
+    currentCellOutputWire = getSourceOfWire(instancesDict,instanceName)    
+    
     if(currentFanOut%maxFanOut == 0):
         nBuffers = (int(currentFanOut/maxFanOut))
     else:
         nBuffers = (int(currentFanOut/maxFanOut)) + 1
     newWires = []
-    for currentWire in wires[graph[instanceName][0][0]]:
+    for currentWire in wires[currentCellOutputWire]:
         if(currentWire[2] == 'input'):
             newWires.append(currentWire)
    
     for currentWire in newWires:
-        wires[graph[instanceName][0][0]].remove(currentWire)
+        wires[currentCellOutputWire].remove(currentWire)
             
             
     counter = 0 #counter for the number of fanout considered
     
     for i in range(nBuffers):
         bufferInstanceName = "new_buffer_" + str(newBufferCounter[0])
-        wires[graph[instanceName][0][0]].append([bufferInstanceName, 'A', 'input'])
+        wires[currentCellOutputWire].append([bufferInstanceName, 'A', 'input'])
         
         myCurrentInstance = {}
         instanceType = "BUFX" + str(size)
         myCurrentInstance["cellType"] = instanceType
-        myCurrentInstance['A'] = graph[instanceName][0][0]
+        myCurrentInstance['A'] = currentCellOutputWire
         myCurrentWire = "new_wire_" + str(newWireCounter[0])
         myCurrentInstance['Y'] = myCurrentWire
        
@@ -197,7 +211,8 @@ def removeViolationsByBuffering(maxFanOut, graph, wires, instancesDict, newWireC
     for key in copyOfGraph:
         if(len(graph[key]) > maxFanOut):
             fixByBuffering(key, len(graph[key]), maxFanOut, 2, newWireCounter, newBufferCounter, instancesDict, wires, graph)
-            constructGraph(wires,instancesDict, graph, library, cload)
+            #constructGraph(wires,instancesDict, graph, library, cload)
+    
 
 
 #this function uses the wires list to construct the graph
