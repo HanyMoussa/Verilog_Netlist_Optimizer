@@ -23,7 +23,7 @@ After parsing the netlist, the user is promted to do one of the following:
 After applying any of the aforementioned functions, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
 
 ## Tests
-The project was tested through 11 tests on 5 different netlists ranging from modules with 2 cells to modules with over 2000 cells. 
+The project was tested through 11 tests on 5 different netlists ranging from modules with 2 cells to modules with over 2000 cells. These tests can be found inside the Examples folder where netlists, schematics and screenshots are present.
 
 ## Files
 
