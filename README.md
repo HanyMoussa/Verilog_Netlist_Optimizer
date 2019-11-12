@@ -10,15 +10,16 @@ Additionally, the library provides the functionality to size up cells accordingl
    Download the library to your machine
    ```
 ## Using the library
-In order to use the optimizer, run the `main.py` script. Essentially, the library has a command line user interface where the user can access all functions.
+In order to use the optimizer, run the `main.py` script. You will be asked to input the name of the verilog netlist, which has to be in the same folder as the `main.py`. Aftwards, the a command line user interface gets displayed where the user can access all functions.
 
-After parsing the netlist, the user is promted to do one of the following:
+The functions the library provides are the following:
 ```
   1- Apply Buffering and specify the maximum fanout
-  2- Apply cloning and specify the maximum fanout
-  3- Apply sizing to optimize the total delay.
-  4- Display the netlist as a graph
-  5- Write the optimized gate-level netlist to a textfile
+  2- Apply the recursive cloning algorithm and specify the maximum fanout
+  3- Apply the iterative cloning algorithm and specify the maximum fanout
+  4- Apply sizing to optimize the total delay.
+  5- Display the netlist as a graph
+  6- Write the optimized gate-level netlist to a textfile
 ```
 After applying any of the aforementioned functions, the maximum delay is displayed as well as the number of instances of each cell type. Moreover, the user gets to either return to the main menu or exit the program.
 
