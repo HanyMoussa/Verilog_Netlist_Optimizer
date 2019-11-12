@@ -52,6 +52,7 @@ Unforunately, our assumptions and the algorithms we utilized have few limitation
 
 ## Acknowledgement:
   This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo.
+  
   In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
 ## Authors:
