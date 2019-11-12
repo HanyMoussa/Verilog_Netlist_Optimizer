@@ -43,7 +43,7 @@ The project was tested through 11 tests on 5 different netlists ranging from mod
 During our development, we had to make some assumptions to for the sake of simplicity:
 
   1. We are assuming that the gate-level netlist would include cells with only 1 output port
-  2. It is assumed that for all cells, the input transision is always the second value in the None Linear Delay Model (NLDM) table. 
+  2. It is assumed that for all cells, the input transition is always the second value in the None Linear Delay Model (NLDM) table. 
   3. Whenever the load capacitance is outside the provided range in NLDM table, linear extrapolation is utilized.
   4. We are assuming that the total delays of all cells are representative of the worst-case delay which might not be the case all the time.
   5. Another assumption we made was that the output delay of any cell was relative to the first input pin.
