@@ -43,23 +43,25 @@ The project was tested through 11 tests on 5 different netlists ranging from mod
 During our development, we had to make some assumptions to for the sake of simplicity:
 
   1. We are assuming that the gate-level netlist would include cells with only 1 output port
-  2. It is assumed that for all cells, the input transision is always the third value in the None Linear Delay Model (NLDM) table. 
+  2. It is assumed that for all cells, the input transision is always the second value in the None Linear Delay Model (NLDM) table. 
   3. Whenever the load capacitance is outside the provided range in NLDM table, linear extrapolation is utilized.
   4. We are assuming that the total delays of all cells are representative of the worst-case delay which might not be the case all the time.
   5. Another assumption we made was that the output delay of any cell was relative to the first input pin.
 
 ## Limitations
-Unforunately, our assumptions and the algorithms we utilized have few limitations:
+Unforunately, our assumptions and the algorithms we utilized have some limitations:
   1. As mentioned in the asssumptions, our project might not operate correctly if cells with multiple output ports are used.
   2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires a lot of time and memory to provide the results. This is just a naive approach for sizing just to show its effect on the total delay.
   3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. To solve this, we added an iterative version of the algorithm.
 
 ## Dependancies:
   The project has 2 main dependancies:
+  
   1- In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
+  
   2- The Liberty parser is dependent on [Lark](https://github.com/lark-parser/lark) and consequently, we had to install it in order to use the liberty parser.
 ## Acknowledgement:
-  This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo.
+  This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo under the supervision of Doctor Mohamed Shalan.
   
 ## Authors:
   * Ramez Moussa - [Github Profile](https://github.com/ramezmoussa)
