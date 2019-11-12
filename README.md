@@ -51,10 +51,12 @@ Unforunately, our assumptions and the algorithms we utilized have few limitation
   2. The sizing algorithm utilized has an exponential complexity. Consequently, it requires a lot of time and memory to provide the results. This is just a naive approach for sizing just to show its effect on the total delay.
   3. The cloning algorithm can reach the maximum recursion depth if the maximum fan out is small and there is a large number of cells. To solve this, we added an iterative version of the algorithm.
 
+## Dependancies:
+  The project has 2 main dependancies:
+  1- In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
+  2- The Liberty parser is dependent on [Lark](https://github.com/lark-parser/lark) and consequently, we had to install it in order to use the liberty parser.
 ## Acknowledgement:
   This was created for the Digital Design 2 Course CSCE3304 at the American University in Cairo.
-  
-  In order to parse the liberty file, we used [The Python Package Index (Pypi) liberty-parser Version 0.0.4](https://pypi.org/project/liberty-parser/)
   
 ## Authors:
   * Ramez Moussa - [Github Profile](https://github.com/ramezmoussa)
