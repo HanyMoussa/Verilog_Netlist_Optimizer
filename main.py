@@ -140,7 +140,8 @@ def displayMenu(netlist):
         
     elif(choice == '8'):
         displayCells()
-        print(getCurrentMaxFanOut(maxInstanceName), maxInstanceName)
+        getCurrentMaxFanOut(maxInstanceName)
+        print("The cell with the maximum fanout:", maxInstanceName, getCurrentMaxFanOut(maxInstanceName))
         reopenMenu()
         
     elif(choice == '9'):
