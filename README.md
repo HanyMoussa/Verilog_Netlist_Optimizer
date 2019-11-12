@@ -17,9 +17,13 @@ Additionally, the library provides the functionality to size up cells accordingl
    To install the library run the following commands: 
    ```
    pip install lark
+   
    pip install numpy
+   
    pip install sympy
+   
    pip install scipy
+   
    git clone https://github.com/HanyMoussa/Verilog_Netlist_Optimizer
    ```
 
