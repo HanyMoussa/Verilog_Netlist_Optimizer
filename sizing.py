@@ -32,9 +32,9 @@ def replaceCell(wires,instancesDict, graph, library, instance, newCellType, cloa
 
 # A function that uses a bruteforce algorithm to try to size every single cell and check the
 # new delay. If it gets improved, then keep the new size. Else, return the cell to its original size.
-def updateSizing(wires,instancesDict, graph, library, cload):
+def updateSizing(wires,instancesDict, graph, library, cload, fanout):
     for instance in graph:
-        if(len(graph[instance]) > maxFanOut):
+        if(len(graph[instance]) > fanout):
             cellType = instancesDict[instance]["cellType"];
             currentSize = cellType[-1]
             if(cellType != 'DFFSR'):

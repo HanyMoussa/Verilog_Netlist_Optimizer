@@ -58,12 +58,15 @@ def displayMenu(netlist):
     print("-------------------------------------------------------")
     print("to end the program press 0")
     print("to reinitialize the data structure using the original netlist press r")
-    print("to apply buffering press 1")
-    print("to apply cloning press 2 (recursive version)")
-    print("to apply cloning press 3 (iterative version)")
+    print("to apply buffering to the whole netlist press 1")
+    print("to apply cloning to the whole netlist press 2 (recursive version)")
+    print("to apply cloning to the whole netlist press 3 (iterative version)")
     print("to apply sizing press 4")
-    print("To display the netlist graph press 5")
-    print("To write the current verilog netlist to a .v file press 6")
+    print("to apply cloning to a single cell press 5")
+    print("to apply buffering to a single cell press 6")
+    print("To display the netlist graph press 7")
+    print("To display the cells and their fanouts press 8")
+    print("To write the current verilog netlist to a .v file press 9")
     print("-------------------------------------------------------")
     
     choice = input()
@@ -92,6 +95,7 @@ def displayMenu(netlist):
         removeViolationsByCloning(int(userMaxFanOut), graph, wires, instancesDict, newWireCounter, newBufferCounter, library, cload, newClonesCounter)
         constructAndDisplay()
         reopenMenu()
+        
     elif(choice == '3'):
         print("Please specify the max fanout for any cell in the netlist")
         userMaxFanOut = input()
@@ -106,15 +110,11 @@ def displayMenu(netlist):
         print("Please specify the minimum fanout of cells to be sized")
         fanout = input()
         print("Apply sizing")
-        updateSizing(wires,instancesDict, graph, library, cload, fanout) 
+        updateSizing(wires,instancesDict, graph, library, cload, int(fanout)) 
         constructAndDisplay()
         reopenMenu()
         
     elif(choice == '5'):
-        displayGraph()
-        reopenMenu()
-        
-    elif(choice == '7'):
         print("Please enter the name of the instance you want to clone (applied to one cell)")
         instanceName = input()
         print("Please specify its maximum fanout")
@@ -124,7 +124,7 @@ def displayMenu(netlist):
         constructAndDisplay()
         reopenMenu()
         
-    elif(choice == '8'):
+    elif(choice == '6'):
         print("Please enter the name of the instance you want to buffer (applied to one cell)")
         instanceName = input()
         print("Please specify its maximum fanout")
@@ -134,12 +134,16 @@ def displayMenu(netlist):
         constructAndDisplay()
         reopenMenu()
         
-    elif(choice == '9'):
+    elif(choice == '7'):
+        displayGraph()
+        reopenMenu()
+        
+    elif(choice == '8'):
         displayCells()
         print(getCurrentMaxFanOut(maxInstanceName), maxInstanceName)
         reopenMenu()
         
-    elif(choice == '6'):
+    elif(choice == '9'):
         writeToFile(netlist)
             
         reopenMenu()
@@ -162,8 +166,7 @@ def reopenMenu():
         reopenMenu()
 
 print("Please input the name of the gatelevel netlist file (netlist.v for exammple)")
-#netlist = input()
-netlist = 'testcase1.v'
+netlist = input()
 cload = 100     # we are assuming that the load capacitance is 100
 
 parseNetlist(netlist, wires, instancesDict, library, netlistUpperSection)
